@@ -30,8 +30,7 @@ public class OrgUnitToFhirBundleConverter implements TypeConverters
     @Converter
     public Bundle ouToBundle( OrganisationUnits organisationUnits, Exchange exchange ) throws IOException
     {
-        Bundle bundle = new Bundle().setType( Bundle.BundleType.BATCH );
-        // Bundle bundle = new Bundle().setType( Bundle.BundleType.TRANSACTION );
+        Bundle bundle = new Bundle().setType( Bundle.BundleType.TRANSACTION );
 
         for ( OrganisationUnit organisationUnit : organisationUnits.getOrganisationUnits() )
         {
@@ -39,10 +38,14 @@ public class OrgUnitToFhirBundleConverter implements TypeConverters
             Location location = createLocation( organisationUnit );
 
             bundle.addEntry().setResource( organization )
-                .getRequest().setUrl( "Organization?identifier=" + organization.getId() ).setMethod( Bundle.HTTPVerb.PUT );
+                .getRequest().setUrl( "Organization?identifier=" + organization.getId() )
+                .setMethod( Bundle.HTTPVerb.POST )
+                .setIfNoneExist( "identifier=" + organization.getId() );
 
             bundle.addEntry().setResource( location )
-                .getRequest().setUrl( "Location?identifier=" + location.getId() ).setMethod( Bundle.HTTPVerb.PUT );
+                .getRequest().setUrl( "Location?identifier=" + location.getId() )
+                .setMethod( Bundle.HTTPVerb.POST )
+                .setIfNoneExist( "identifier=" + location.getId() );
         }
 
         exchange.getIn().setHeader( FhirConstants.PROPERTY_PREFIX + "bundle", bundle );

@@ -8,8 +8,7 @@ import java.util.List;
 
 @Data
 @JsonIgnoreProperties( ignoreUnknown = true )
-public
-class OrganisationUnits
+public class OrganisationUnits
 {
     private List<OrganisationUnit> organisationUnits = new ArrayList<>();
 }

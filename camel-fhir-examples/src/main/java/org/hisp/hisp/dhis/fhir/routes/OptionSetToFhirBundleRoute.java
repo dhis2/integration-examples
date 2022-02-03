@@ -23,7 +23,8 @@ public class OptionSetToFhirBundleRoute extends RouteBuilder
     @Override
     public void configure()
     {
-        String sourceUrl = dhisProperties.getBaseUrl() + "/api/optionSets.json?fields=id,code,name,description,version,options[id,code,name]&paging=false";
+        String sourceUrl = dhisProperties.getBaseUrl()
+            + "/api/optionSets.json?fields=id,code,name,description,version,options[id,code,name]&paging=false&filter=id:eq:HB33RvLvVZe";
         String basicAuth = HttpHeaders.encodeBasicAuth( dhisProperties.getUsername(), dhisProperties.getPassword(), StandardCharsets.UTF_8 );
 
         JacksonDataFormat jacksonDataFormat = new JacksonDataFormat( OptionSets.class );

@@ -27,7 +27,7 @@ public class OptionSetToFhirBundleConverter implements TypeConverters
     @Converter
     public Bundle osToFhirBundle( OptionSets optionSets, Exchange exchange )
     {
-        Bundle bundle = new Bundle().setType( Bundle.BundleType.BATCH );
+        Bundle bundle = new Bundle().setType( Bundle.BundleType.TRANSACTION );
 
         for ( OptionSet optionSet : optionSets.getOptionSets() )
         {

@@ -22,7 +22,8 @@ public class TrackedEntityToFhirBundleConverter implements TypeConverters
 {
     private final DhisProperties dhisProperties;
 
-    @Converter public Bundle teToBundle( TrackedEntities trackedEntities, Exchange exchange )
+    @Converter
+    public Bundle teToBundle( TrackedEntities trackedEntities, Exchange exchange )
     {
         Bundle bundle = new Bundle().setType( Bundle.BundleType.BATCH );
 
@@ -30,7 +31,9 @@ public class TrackedEntityToFhirBundleConverter implements TypeConverters
         {
             Patient patient = createPatient( trackedEntity );
 
-            bundle.addEntry().setResource( patient ).getRequest().setUrl( "Patient?identifier=" + patient.getId() ).setMethod( Bundle.HTTPVerb.PUT );
+            bundle.addEntry()
+                .setResource( patient ).getRequest().setUrl( "Patient?identifier=" + patient.getId() )
+                .setMethod( Bundle.HTTPVerb.PUT );
         }
 
         exchange.getIn().setHeader( FhirConstants.PROPERTY_PREFIX + "bundle", bundle );
@@ -53,7 +56,7 @@ public class TrackedEntityToFhirBundleConverter implements TypeConverters
             new Identifier().setSystem( namespace ).setValue( trackedEntity.getId() )
         );
 
-        patient.setManagingOrganization( new Reference( "Organization/" + trackedEntity.getOrgUnit() ) );
+        patient.setManagingOrganization( new Reference( "Organization?identifier=" + trackedEntity.getOrgUnit() ) );
 
         patient.setGender( getGender( gender ) );
         patient.getName().add( new HumanName().addGiven( firstName ).setFamily( lastName ) );
