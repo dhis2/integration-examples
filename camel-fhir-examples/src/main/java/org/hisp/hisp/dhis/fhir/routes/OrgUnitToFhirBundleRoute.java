@@ -32,9 +32,9 @@ public class OrgUnitToFhirBundleRoute extends RouteBuilder
             .unmarshal( new JacksonDataFormat( OrganisationUnits.class ) )
             .log( "Converting ${body.organisationUnits.size()} organisation units." )
             .convertBodyTo( Bundle.class )
-            .to( "fhir://transaction/withBundle?client=#fhirClient" )
+            // .to( "fhir://transaction/withBundle?client=#fhirClient" )
             .marshal().fhirJson( fhirProperties.getFhirVersion().name(), true )
             .to( "file:data/fhir-output?filename=orgUnits.json" )
-            .log("Done.");
+            .log( "Done." );
     }
 }

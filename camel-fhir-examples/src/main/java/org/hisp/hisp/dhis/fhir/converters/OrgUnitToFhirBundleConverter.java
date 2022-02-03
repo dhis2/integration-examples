@@ -30,8 +30,8 @@ public class OrgUnitToFhirBundleConverter implements TypeConverters
     @Converter
     public Bundle ouToBundle( OrganisationUnits organisationUnits, Exchange exchange ) throws IOException
     {
-        // Bundle bundle = new Bundle().setType( Bundle.BundleType.BATCH );
-        Bundle bundle = new Bundle().setType( Bundle.BundleType.TRANSACTION );
+        Bundle bundle = new Bundle().setType( Bundle.BundleType.BATCH );
+        // Bundle bundle = new Bundle().setType( Bundle.BundleType.TRANSACTION );
 
         for ( OrganisationUnit organisationUnit : organisationUnits.getOrganisationUnits() )
         {
