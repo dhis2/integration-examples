@@ -6,11 +6,11 @@ import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.hisp.hisp.dhis.fhir.config.properties.DhisProperties;
 import org.hisp.hisp.dhis.fhir.config.properties.FhirProperties;
 import org.hisp.hisp.dhis.fhir.domain.OrganisationUnits;
-import org.hl7.fhir.r4.model.Bundle;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -32,11 +32,11 @@ public class OrgUnitToFhirBundleRoute extends RouteBuilder
         from( "timer://foo?repeatCount=1" ).routeId( "dhis2-ou-to-fhir-bundle" )
             .setHeader( "Authorization", constant( String.format( "Basic %s", basicAuth ) ) )
             .to( sourceUrl )
-            .unmarshal( jacksonDataFormat )
-            .log( "Converting ${body.organisationUnits.size()} organisation units." )
-            .convertBodyTo( Bundle.class )
-            // .to( "fhir://transaction/withBundle?client=#fhirClient" )
-            .marshal().fhirJson( fhirProperties.getFhirVersion().name(), true )
+            .transform( datasonnet( "resource:classpath:bundle.ds", Map.class, "application/json",
+                "application/x-java-object" ) )
+            .marshal().json()
+            .convertBodyTo( String.class )
+            .to( "fhir://transaction/withBundle?inBody=stringBundle&client=#fhirClient" )
             .to( "file:data/fhir-output?filename=orgUnits.json" )
             .log( "Done." );
     }
