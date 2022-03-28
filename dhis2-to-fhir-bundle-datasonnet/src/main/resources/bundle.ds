@@ -1,0 +1,12 @@
+local location = import 'location.libsonnet';
+local organization = import 'organization.libsonnet';
+
+local entries(orgUnit) =
+  [organization.organization_resource(ds, orgUnit)] +
+  [location.location_resource(ds, orgUnit)];
+
+{
+  resourceType: 'Bundle',
+  type: 'transaction',
+  entry: std.flatMap(entries, body.organisationUnits),
+}
