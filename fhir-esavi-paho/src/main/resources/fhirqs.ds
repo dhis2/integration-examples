@@ -12,6 +12,11 @@ local teiAttributesMap = {
   "uid" : "KSr2yTdu1AI"
 };
 
+local dataElementsMap = {
+  "incident_date" : "LYariSd5cEq",
+  "esavi_narrative_description" : "ci3S3BH6wZn"
+};
+
 // http://hl7.org/fhir/R4/valueset-administrative-gender.html
 // https://dev.paho-dhis2.org/api/optionSets/WDUwjiW2rGH.json?fields=options[code,name]
 local genderMap = {
@@ -38,10 +43,22 @@ local appendTimeToDate(str) = std.join("T",[str,"00:00:00"]);
 local formatDate(str) = DS.LocalDateTime.format(str, "dd-MM-yyyy'T'HH:mm:ss", "yyyy-MM-dd");
 
 // Preprocessing
-local teiAttributes = ds.foldLeft(payload.attributes, {},
-function(curr, prev) ds.combine(curr, {
-  [prev.attribute]:prev.value
-}));
+
+// pre-processing tei attributes : creates {teiAttributeId:value} map
+
+//local teiAttributes = ds.foldLeft(payload.attributes, {},
+//function(curr, prev) ds.combine(curr, {
+//  [prev.attribute]:prev.value
+//}));
+
+local teiAttributes = payload.teiAttributes;
+local dataValues = payload.dataValues;
+
+// This function returns the tracked entity attribute given the code
+local ta(code, default="") = get(teiAttributes, teiAttributesMap[code], default);
+
+// This function returns the data value given the code
+local dv(code, default="") = get(dataValues, dataElementsMap[code], default);
 
 // Creating the Payload
 {
@@ -130,8 +147,8 @@ function(curr, prev) ds.combine(curr, {
                 {
                   "valueCoding": {
                     "system": "http://hl7.org/fhir/CodeSystem/administrative-gender",
-                    "code": genderMap[get(teiAttributes, teiAttributesMap["gender"], "3")],
-                    "display": genderMapDisplay[get(teiAttributes, teiAttributesMap["gender"], "3")]
+                    "code": genderMap[ta("gender", "3")],
+                    "display": genderMapDisplay[ta("gender", "3")]
                   }
                 }
               ]
@@ -142,7 +159,7 @@ function(curr, prev) ds.combine(curr, {
               "text": "Fecha de nacimiento del Paciente",
               "answer": [
                 {
-                  "valueDate": formatDate(appendTimeToDate(teiAttributes[teiAttributesMap["dob"]]))
+                  "valueDate": formatDate(appendTimeToDate(ta("dob")))
                 }
               ]
             },
@@ -153,6 +170,327 @@ function(curr, prev) ds.combine(curr, {
               "answer": [
                 {
                   "valueString": "todo asdf"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "registroESAVI",
+      // todo ESAVI registry developed by the vaccinated
+      "text": "Registro de ESAVI desarrollado por el vacunado",
+      "item": [
+        {
+          "linkId": "datosESAVI",
+          // todo ESAVI information and its classification according to severity
+          "text": "Información del ESAVI y de su clasificación según gravedad",
+          "item": [
+            {
+              "linkId": "nombreESAVI",
+              // todo Name of ESAVI : Is this a constant?
+              "text": "Nombre del ESAVI",
+              "answer": [
+                {
+                  "valueString": "Plaquetas baixas"
+                }
+              ]
+            },
+            {
+              "linkId": "codigoESAVIMedDRA",
+              // todo MedDRA code of reported Adverse Event
+              "text": "Código MedDRA del Evento Adverso notificado",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/EsaviMedDRACS",
+                    "code": "10024922",
+                    "display": "trastorno de las plaquetas"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "fechaESAVI",
+              // Start date of the ESAVI referred by the patient or identified by the doctor
+              "text": "Fecha de inicio del ESAVI referido por el paciente o identificado por el médico",
+              "answer": [
+                {
+                  "valueDate": dv("incident_date")
+                }
+              ]
+            },
+            {
+              "linkId": "descripcionESAVI",
+              // ESAVI narrative description
+              "text": "Descripción narrativa del ESAVI",
+              "answer": [
+                {
+                  "valueString": dv("esavi_narrative_description")
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "datosESAVI",
+          // todo start here
+          "text": "Información del ESAVI y de su clasificación según gravedad",
+          "item": [
+            {
+              "linkId": "nombreESAVI",
+              "text": "Nombre del ESAVI ",
+              "answer": [
+                {
+                  "valueString": "Hematuria"
+                }
+              ]
+            },
+            {
+              "linkId": "codigoESAVIMedDRA",
+              "text": "Código MedDRA del Evento Adverso notificado",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/EsaviMedDRACS",
+                    "code": "10005604",
+                    "display": "Hematuria"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "fechaESAVI",
+              "text": "Fecha de inicio del ESAVI referido por el paciente o identificado por el médico",
+              "answer": [
+                {
+                  "valueDate": "2021-07-21"
+                }
+              ]
+            },
+            {
+              "linkId": "descripcionESAVI",
+              "text": "Descripción narrativa del ESAVI",
+              "answer": [
+                {
+                  "valueString": "Ficou hospitalizado 4 dias apresentou hematúria."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "datosESAVI",
+          "text": "Información del ESAVI y de su clasificación según gravedad",
+          "item": [
+            {
+              "linkId": "nombreESAVI",
+              "text": "Nombre del ESAVI ",
+              "answer": [
+                {
+                  "valueString": "Equimoses"
+                }
+              ]
+            },
+            {
+              "linkId": "codigoESAVIMedDRA",
+              "text": "Código MedDRA del Evento Adverso notificado",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/EsaviMedDRACS",
+                    "code": "10014080",
+                    "display": "Equimosis"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "fechaESAVI",
+              "text": "Fecha de inicio del ESAVI referido por el paciente o identificado por el médico",
+              "answer": [
+                {
+                  "valueDate": "2021-07-21"
+                }
+              ]
+            },
+            {
+              "linkId": "descripcionESAVI",
+              "text": "Descripción narrativa del ESAVI",
+              "answer": [
+                {
+                  "valueString": "Ficou hospitalizado 4 dias apresentou equimoses"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "datosESAVI",
+          "text": "Información del ESAVI y de su clasificación según gravedad",
+          "item": [
+            {
+              "linkId": "nombreESAVI",
+              "text": "Nombre del ESAVI ",
+              "answer": [
+                {
+                  "valueString": "Sangramento gengival"
+                }
+              ]
+            },
+            {
+              "linkId": "codigoESAVIMedDRA",
+              "text": "Código MedDRA del Evento Adverso notificado",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/EsaviMedDRACS",
+                    "code": "10018292",
+                    "display": "gingivitis"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "fechaESAVI",
+              "text": "Fecha de inicio del ESAVI referido por el paciente o identificado por el médico",
+              "answer": [
+                {
+                  "valueDate": "2021-07-20"
+                }
+              ]
+            },
+            {
+              "linkId": "descripcionESAVI",
+              "text": "Descripción narrativa del ESAVI",
+              "answer": [
+                {
+                  "valueString": "paciente presenta sangrado gingival"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "gravedadESAVI",
+          "text": "Determinación del estado de gravedad del ESAVI",
+          "item": [
+            {
+              "linkId": "tipoGravedad",
+              "text": "¿ESAVI Grave?",
+              "answer": [
+                {
+                  "valueBoolean": true
+                }
+              ]
+            },
+            {
+              "linkId": "gravMuerte",
+              "text": "Muerte",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravRiesgoVida",
+              "text": "Amenaza la vida al momento de la detección del ESAVI",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravDiscapacidad",
+              "text": "Genera discapacidad severa o permanente al momento de la detección",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravHospitalizacion",
+              "text": "Hospitalización o prolongación de la misma",
+              "answer": [
+                {
+                  "valueBoolean": true
+                }
+              ]
+            },
+            {
+              "linkId": "gravAnomaliaCongenita",
+              "text": "Anomalía congénita",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravAborto",
+              "text": "Aborto",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravMuerteFetal",
+              "text": "Muerte fetal",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "otrosEventosImportantes",
+              "text": "Otros Eventos considerados Médicamente Importantes",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "desenlaceESAVI",
+          "text": "Desenlace ESAVI",
+          "item": [
+            {
+              "linkId": "codDesenlaceESAVI",
+              "text": "Código Desenlace ESAVI",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/ClasificacionDesenlaceCS",
+                    "code": "2",
+                    "display": "En recuperación"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "comentarios",
+              "text": "Comentarios adicionales en cuanto al cuadro ESAVI",
+              "answer": [
+                {
+                  "valueString": "Paciente relata alergia a chocolate e ingeriu. Diz que 2 colegas do trabalho apresentaram os mesmos sintomas petéquias hj 20/07"
+                }
+              ]
+            },
+            {
+              "linkId": "fechaInicioInvestigacion",
+              "text": "Fecha en la cual se inicia investigación",
+              "answer": [
+                {
+                  "valueDate": "2021-09-20"
                 }
               ]
             }

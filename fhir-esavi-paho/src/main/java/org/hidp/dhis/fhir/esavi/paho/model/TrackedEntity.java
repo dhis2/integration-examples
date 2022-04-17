@@ -12,4 +12,5 @@ public class TrackedEntity {
     private String trackedEntityInstance;
     private String orgUnit;
     private List<TrackedEntityAttribute> attributes = new ArrayList<>();
+    private List<Enrollment> enrollments = new ArrayList<>();
 }
