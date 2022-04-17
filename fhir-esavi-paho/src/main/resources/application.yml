@@ -8,4 +8,4 @@ dhis2-to-fhir:
   dhis2:
     base-url: https://dev.paho-dhis2.org/
     username: integration
-    password: d6X!#df@CUmgye
+    password: password
