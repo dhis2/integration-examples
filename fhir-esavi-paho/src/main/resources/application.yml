@@ -1,0 +1,11 @@
+server:
+  port: 8080
+  address: 127.0.0.1
+camel:
+  springboot:
+    main-run-controller: true
+dhis2-to-fhir:
+  dhis2:
+    base-url: https://dev.paho-dhis2.org/
+    username: integration
+    password: d6X!#df@CUmgye
