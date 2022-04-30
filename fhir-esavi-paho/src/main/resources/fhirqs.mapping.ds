@@ -7,14 +7,11 @@ output application/json
 
 // Instance Specific Mappings
 local teiAttributesMap = {
-  "gender" : "oindugucx72",
-  "dob" : "NI0QRzJvQ0k",
-  "uid" : "KSr2yTdu1AI"
+  %teiatt_mappings%
 };
 
 local dataElementsMap = {
-  "incident_date" : "LYariSd5cEq",
-  "esavi_narrative_description" : "ci3S3BH6wZn"
+  %de_mappings%
 };
 
 // http://hl7.org/fhir/R4/valueset-administrative-gender.html
@@ -88,7 +85,7 @@ local dv(code, default="") = get(dataValues, dataElementsMap[code], default);
               "text": "UUID que identifica el caso o notificación. Una persona puede tener más de una notificación.",
               "answer": [
                 {
-                  "valueString": "1422100147620 TODO"
+                  "valueString": ta("uid")
                 }
               ]
             },
@@ -111,7 +108,7 @@ local dv(code, default="") = get(dataValues, dataElementsMap[code], default);
               "text": "UUID de identificación",
               "answer": [
                 {
-                  "valueString": "TODO f309923b7f5b8512eb70fa8361decfb1"
+                  "valueString": ta("patient_id")
                 }
               ]
             },
