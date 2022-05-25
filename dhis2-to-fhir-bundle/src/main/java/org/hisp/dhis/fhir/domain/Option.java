@@ -1,4 +1,4 @@
-package org.hisp.hisp.dhis.fhir.domain;
+package org.hisp.dhis.fhir.domain;
 
 import lombok.Data;
 

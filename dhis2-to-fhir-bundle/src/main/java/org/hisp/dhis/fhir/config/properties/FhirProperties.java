@@ -1,4 +1,4 @@
-package org.hisp.hisp.dhis.fhir.config.properties;
+package org.hisp.dhis.fhir.config.properties;
 
 import ca.uhn.fhir.context.FhirVersionEnum;
 import lombok.Data;
