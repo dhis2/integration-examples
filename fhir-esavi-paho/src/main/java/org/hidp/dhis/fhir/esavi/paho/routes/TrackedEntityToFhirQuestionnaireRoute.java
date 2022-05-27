@@ -27,8 +27,8 @@ public class TrackedEntityToFhirQuestionnaireRoute extends RouteBuilder {
 
         // generating the mapping file
         Path tempFile = Files.createTempFile("mapping", ".ds");
-        MappingFileGenerator processor = new MappingFileGenerator(tempFile);
-        processor.generate();
+        MappingFileGenerator mappingFileGenerator = new MappingFileGenerator(tempFile);
+        mappingFileGenerator.generate();
 
         // doing the mapping
         from("timer://foo?repeatCount=1")
