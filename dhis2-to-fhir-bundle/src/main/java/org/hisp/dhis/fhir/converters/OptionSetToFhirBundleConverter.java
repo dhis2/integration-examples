@@ -1,14 +1,14 @@
-package org.hisp.hisp.dhis.fhir.converters;
+package org.hisp.dhis.fhir.converters;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.Converter;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConverters;
 import org.apache.camel.component.fhir.internal.FhirConstants;
-import org.hisp.hisp.dhis.fhir.config.properties.DhisProperties;
-import org.hisp.hisp.dhis.fhir.domain.Option;
-import org.hisp.hisp.dhis.fhir.domain.OptionSet;
-import org.hisp.hisp.dhis.fhir.domain.OptionSets;
+import org.hisp.dhis.fhir.config.properties.DhisProperties;
+import org.hisp.dhis.fhir.domain.Option;
+import org.hisp.dhis.fhir.domain.OptionSet;
+import org.hisp.dhis.fhir.domain.OptionSets;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.Enumerations;

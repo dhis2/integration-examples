@@ -1,13 +1,13 @@
-package org.hisp.hisp.dhis.fhir.converters;
+package org.hisp.dhis.fhir.converters;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.Converter;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConverters;
 import org.apache.camel.component.fhir.internal.FhirConstants;
-import org.hisp.hisp.dhis.fhir.config.properties.DhisProperties;
-import org.hisp.hisp.dhis.fhir.domain.TrackedEntities;
-import org.hisp.hisp.dhis.fhir.domain.TrackedEntity;
+import org.hisp.dhis.fhir.config.properties.DhisProperties;
+import org.hisp.dhis.fhir.domain.TrackedEntities;
+import org.hisp.dhis.fhir.domain.TrackedEntity;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.HumanName;

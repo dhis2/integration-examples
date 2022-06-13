@@ -1,10 +1,10 @@
-package org.hisp.hisp.dhis.fhir;
+package org.hisp.dhis.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import lombok.RequiredArgsConstructor;
-import org.hisp.hisp.dhis.fhir.config.properties.DhisProperties;
-import org.hisp.hisp.dhis.fhir.config.properties.FhirProperties;
+import org.hisp.dhis.fhir.config.properties.DhisProperties;
+import org.hisp.dhis.fhir.config.properties.FhirProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

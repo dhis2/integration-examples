@@ -1,11 +1,11 @@
-package org.hisp.hisp.dhis.fhir.routes;
+package org.hisp.dhis.fhir.routes;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jackson.JacksonDataFormat;
-import org.hisp.hisp.dhis.fhir.config.properties.DhisProperties;
-import org.hisp.hisp.dhis.fhir.config.properties.FhirProperties;
-import org.hisp.hisp.dhis.fhir.domain.OrganisationUnits;
+import org.hisp.dhis.fhir.config.properties.DhisProperties;
+import org.hisp.dhis.fhir.config.properties.FhirProperties;
+import org.hisp.dhis.fhir.domain.OrganisationUnits;
 import org.hl7.fhir.r4.model.Bundle;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
