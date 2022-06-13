@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
   address: 127.0.0.1
 camel:
   springboot:
@@ -9,3 +9,6 @@ dhis2-to-fhir:
     base-url: https://dev.paho-dhis2.org/
     username: integration
     password: ${DHIS2_PASSWORD}
+  fhir:
+    server-url: http://localhost:8080/fhir/
+    fhir-version: R4
