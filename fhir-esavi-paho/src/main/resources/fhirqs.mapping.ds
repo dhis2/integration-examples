@@ -1,0 +1,499 @@
+/** DataSonnet
+version=2.0
+input payload application/json
+output application/json
+*/
+//DataSonnet mapping starts here
+
+// Instance Specific Mappings
+local teiAttributesMap = {
+  %teiatt_mappings%
+};
+
+local dataElementsMap = {
+  %de_mappings%
+};
+
+// http://hl7.org/fhir/R4/valueset-administrative-gender.html
+// https://dev.paho-dhis2.org/api/optionSets/WDUwjiW2rGH.json?fields=options[code,name]
+local genderMap = {
+  "1": "male",
+  "2": "female",
+  "3": "other"
+};
+local genderMapDisplay = {
+  "1": "Male",
+  "2": "Female",
+  "3": "Other"
+};
+
+// util functions
+
+// Note: based on docs, this function will be available in std package in the next release
+local get(obj, field, default) = if std.objectHas(obj, field) then obj[field] else default;
+
+// DS has only date time package which expects time component in the input.
+// This util function can be used to convert a date string to a <date_part>'T'00:00:00 format
+local appendTimeToDate(str) = std.join("T",[str,"00:00:00"]);
+
+// This util function can be used to convert DHIS2 dates to fhir compatible dates
+local formatDate(str) = DS.LocalDateTime.format(str, "dd-MM-yyyy'T'HH:mm:ss", "yyyy-MM-dd");
+
+// Preprocessing
+
+// pre-processing tei attributes : creates {teiAttributeId:value} map
+
+//local teiAttributes = ds.foldLeft(payload.attributes, {},
+//function(curr, prev) ds.combine(curr, {
+//  [prev.attribute]:prev.value
+//}));
+
+local teiAttributes = payload.teiAttributes;
+local dataValues = payload.dataValues;
+
+// This function returns the tracked entity attribute given the code
+local ta(code, default="") = get(teiAttributes, teiAttributesMap[code], default);
+
+// This function returns the data value given the code
+local dv(code, default="") = get(dataValues, dataElementsMap[code], default);
+
+// Creating the Payload
+{
+  "resourceType": "QuestionnaireResponse",
+  "id": "1331",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2022-03-29T18:36:58.286+00:00",
+    "source": "#wSqGUzJhBLkG4WGh"
+  },
+  "questionnaire": "http://paho.org/esavi/Questionnaire/ejemploQuestionnaireEsavi4",
+  "status": "completed",
+  "authored": "2022-03-10T10:20:00Z",
+  "item": [
+    {
+      "linkId": "datosPacienteCaso",
+      // ESAVI Patient Demographics
+      "text": "Datos Demográficos de Paciente ESAVI",
+      "item": [
+        {
+          "linkId": "datosPaciente",
+          "text": "Datos del Paciente ESAVI",
+          "item": [
+            {
+              "linkId": "numeroCaso",
+              // TODO UUID that identifies the case or notification. A person can have more than one notification.
+              "text": "UUID que identifica el caso o notificación. Una persona puede tener más de una notificación.",
+              "answer": [
+                {
+                  "valueString": ta("uid")
+                }
+              ]
+            },
+            {
+              "linkId": "paisOrigen-Reg",
+              "text": "País en donde se originó el Registro",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/CodPaises",
+                    "code": "BR TODO",
+                    "display": "Brazil TODO"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "idPaciente",
+              // TODO ID UUID
+              "text": "UUID de identificación",
+              "answer": [
+                {
+                  "valueString": ta("patient_id")
+                }
+              ]
+            },
+            {
+              "linkId": "codigoResidenciaHabitual",
+              // TODO Subnational Geographic Level Code of the Habitual Residence of the Person affected by the ESAVI
+              "text": "Codigo Nivel Geográfico Subnacional de la Residencia Habitual de la Persona afectada por el ESAVI",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/DirOrgNotiCS",
+                    "code": "TODO BR_SC_42_05407",
+                    "display": "TODO Florianópolis (Municipio), Santa Catarina, Brazil"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "nombreResidenciaHabitual",
+              // TODO Name Subnational Geographical Level of the Habitual Residence of the Person affected by the ESAVI
+              "text": "Nombre Nivel Geográfico Subnacional de la Residencia Habitual de la Persona afectada por el ESAVI",
+              "answer": [
+                {
+                  "valueString": "TODO Florianópolis"
+                }
+              ]
+            },
+            {
+              "linkId": "sexoPaciente",
+              // Sex of the vaccinated.
+              "text": "Sexo del paciente",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/CodeSystem/administrative-gender",
+                    "code": genderMap[ta("gender", "3")],
+                    "display": genderMapDisplay[ta("gender", "3")]
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "fechaNacimiento",
+              // Date of birth of the vaccinated
+              "text": "Fecha de nacimiento del Paciente",
+              "answer": [
+                {
+                  "valueDate": formatDate(appendTimeToDate(ta("dob")))
+                }
+              ]
+            },
+            {
+              "linkId": "etnia",
+              // todo Name of the ethnic group with which the vaccinated identifies
+              "text": "Etnia reconcida por el paciente",
+              "answer": [
+                {
+                  "valueString": "todo asdf"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "registroESAVI",
+      // todo ESAVI registry developed by the vaccinated
+      "text": "Registro de ESAVI desarrollado por el vacunado",
+      "item": [
+        {
+          "linkId": "datosESAVI",
+          // todo ESAVI information and its classification according to severity
+          "text": "Información del ESAVI y de su clasificación según gravedad",
+          "item": [
+            {
+              "linkId": "nombreESAVI",
+              // todo Name of ESAVI : Is this a constant?
+              "text": "Nombre del ESAVI",
+              "answer": [
+                {
+                  "valueString": "Plaquetas baixas"
+                }
+              ]
+            },
+            {
+              "linkId": "codigoESAVIMedDRA",
+              // todo MedDRA code of reported Adverse Event
+              "text": "Código MedDRA del Evento Adverso notificado",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/EsaviMedDRACS",
+                    "code": "10024922",
+                    "display": "trastorno de las plaquetas"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "fechaESAVI",
+              // Start date of the ESAVI referred by the patient or identified by the doctor
+              "text": "Fecha de inicio del ESAVI referido por el paciente o identificado por el médico",
+              "answer": [
+                {
+                  "valueDate": dv("incident_date")
+                }
+              ]
+            },
+            {
+              "linkId": "descripcionESAVI",
+              // ESAVI narrative description
+              "text": "Descripción narrativa del ESAVI",
+              "answer": [
+                {
+                  "valueString": dv("esavi_narrative_description")
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "datosESAVI",
+          // todo start here
+          "text": "Información del ESAVI y de su clasificación según gravedad",
+          "item": [
+            {
+              "linkId": "nombreESAVI",
+              "text": "Nombre del ESAVI ",
+              "answer": [
+                {
+                  "valueString": "Hematuria"
+                }
+              ]
+            },
+            {
+              "linkId": "codigoESAVIMedDRA",
+              "text": "Código MedDRA del Evento Adverso notificado",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/EsaviMedDRACS",
+                    "code": "10005604",
+                    "display": "Hematuria"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "fechaESAVI",
+              "text": "Fecha de inicio del ESAVI referido por el paciente o identificado por el médico",
+              "answer": [
+                {
+                  "valueDate": "2021-07-21"
+                }
+              ]
+            },
+            {
+              "linkId": "descripcionESAVI",
+              "text": "Descripción narrativa del ESAVI",
+              "answer": [
+                {
+                  "valueString": "Ficou hospitalizado 4 dias apresentou hematúria."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "datosESAVI",
+          "text": "Información del ESAVI y de su clasificación según gravedad",
+          "item": [
+            {
+              "linkId": "nombreESAVI",
+              "text": "Nombre del ESAVI ",
+              "answer": [
+                {
+                  "valueString": "Equimoses"
+                }
+              ]
+            },
+            {
+              "linkId": "codigoESAVIMedDRA",
+              "text": "Código MedDRA del Evento Adverso notificado",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/EsaviMedDRACS",
+                    "code": "10014080",
+                    "display": "Equimosis"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "fechaESAVI",
+              "text": "Fecha de inicio del ESAVI referido por el paciente o identificado por el médico",
+              "answer": [
+                {
+                  "valueDate": "2021-07-21"
+                }
+              ]
+            },
+            {
+              "linkId": "descripcionESAVI",
+              "text": "Descripción narrativa del ESAVI",
+              "answer": [
+                {
+                  "valueString": "Ficou hospitalizado 4 dias apresentou equimoses"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "datosESAVI",
+          "text": "Información del ESAVI y de su clasificación según gravedad",
+          "item": [
+            {
+              "linkId": "nombreESAVI",
+              "text": "Nombre del ESAVI ",
+              "answer": [
+                {
+                  "valueString": "Sangramento gengival"
+                }
+              ]
+            },
+            {
+              "linkId": "codigoESAVIMedDRA",
+              "text": "Código MedDRA del Evento Adverso notificado",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/EsaviMedDRACS",
+                    "code": "10018292",
+                    "display": "gingivitis"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "fechaESAVI",
+              "text": "Fecha de inicio del ESAVI referido por el paciente o identificado por el médico",
+              "answer": [
+                {
+                  "valueDate": "2021-07-20"
+                }
+              ]
+            },
+            {
+              "linkId": "descripcionESAVI",
+              "text": "Descripción narrativa del ESAVI",
+              "answer": [
+                {
+                  "valueString": "paciente presenta sangrado gingival"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "gravedadESAVI",
+          "text": "Determinación del estado de gravedad del ESAVI",
+          "item": [
+            {
+              "linkId": "tipoGravedad",
+              "text": "¿ESAVI Grave?",
+              "answer": [
+                {
+                  "valueBoolean": true
+                }
+              ]
+            },
+            {
+              "linkId": "gravMuerte",
+              "text": "Muerte",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravRiesgoVida",
+              "text": "Amenaza la vida al momento de la detección del ESAVI",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravDiscapacidad",
+              "text": "Genera discapacidad severa o permanente al momento de la detección",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravHospitalizacion",
+              "text": "Hospitalización o prolongación de la misma",
+              "answer": [
+                {
+                  "valueBoolean": true
+                }
+              ]
+            },
+            {
+              "linkId": "gravAnomaliaCongenita",
+              "text": "Anomalía congénita",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravAborto",
+              "text": "Aborto",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "gravMuerteFetal",
+              "text": "Muerte fetal",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "otrosEventosImportantes",
+              "text": "Otros Eventos considerados Médicamente Importantes",
+              "answer": [
+                {
+                  "valueBoolean": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "desenlaceESAVI",
+          "text": "Desenlace ESAVI",
+          "item": [
+            {
+              "linkId": "codDesenlaceESAVI",
+              "text": "Código Desenlace ESAVI",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "system": "http://paho.org/esavi/CodeSystem/ClasificacionDesenlaceCS",
+                    "code": "2",
+                    "display": "En recuperación"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "comentarios",
+              "text": "Comentarios adicionales en cuanto al cuadro ESAVI",
+              "answer": [
+                {
+                  "valueString": "Paciente relata alergia a chocolate e ingeriu. Diz que 2 colegas do trabalho apresentaram os mesmos sintomas petéquias hj 20/07"
+                }
+              ]
+            },
+            {
+              "linkId": "fechaInicioInvestigacion",
+              "text": "Fecha en la cual se inicia investigación",
+              "answer": [
+                {
+                  "valueDate": "2021-09-20"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
