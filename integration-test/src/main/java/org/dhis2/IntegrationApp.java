@@ -28,8 +28,8 @@ public final class IntegrationApp
         String dataSetId = args[8];
         String period = args[9];
 
-        // pull data value sets from source DHIS2 instance
-        HttpResponse<JsonNode> dataValueSets = Unirest.get(
+        // pull data value set from source DHIS2 instance
+        HttpResponse<JsonNode> dataValueSet = Unirest.get(
                 sourceDhis2ApiUrl + "/dataValueSets?dataSet={dataSetId}&period={period}&orgUnit={orgUnitId}" )
             .routeParam( "dataSetId", dataSetId )
             .routeParam( "period", period )
@@ -37,16 +37,16 @@ public final class IntegrationApp
             .basicAuth( sourceDhis2ApiUsername, sourceDhis2ApiPassword ).asJson();
 
         // replace source org unit IDs with target org unit IDs
-        dataValueSets.getBody().getObject().put( "orgUnit", targetOrgUnitId );
-        for ( Object dataValue : dataValueSets.getBody().getObject().getJSONArray( "dataValues" ) )
+        dataValueSet.getBody().getObject().put( "orgUnit", targetOrgUnitId );
+        for ( Object dataValue : dataValueSet.getBody().getObject().getJSONArray( "dataValues" ) )
         {
             ((JSONObject) dataValue).put( "orgUnit", targetOrgUnitId );
         }
 
-        // push data value sets to destination DHIS2 instance
+        // push data value set to destination DHIS2 instance
         Unirest.post( targetDhis2ApiUrl + "/dataValueSets" )
             .contentType( ContentType.APPLICATION_JSON.toString() )
-            .body( dataValueSets.getBody() )
+            .body( dataValueSet.getBody() )
             .basicAuth( targetDhis2ApiUsername, targetDhis2ApiPassword ).asString();
     }
 }
