@@ -34,8 +34,10 @@ import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.hidp.dhis.fhir.esavi.paho.config.DhisProperties;
+import org.hidp.dhis.fhir.esavi.paho.config.FhirProperties;
 import org.hidp.dhis.fhir.esavi.paho.model.DataHolder;
 import org.hidp.dhis.fhir.esavi.paho.model.TrackedEntity;
 import org.hidp.dhis.fhir.esavi.paho.util.MappingFileGenerator;
@@ -47,6 +49,8 @@ import org.springframework.stereotype.Component;
 public class TrackedEntityToFhirQuestionnaireRoute extends RouteBuilder
 {
     private final DhisProperties dhisProperties;;
+
+    private final FhirProperties fhirProperties;;
 
     @Override
     public void configure()
@@ -63,7 +67,7 @@ public class TrackedEntityToFhirQuestionnaireRoute extends RouteBuilder
         mappingFileGenerator.generate();
 
         // doing the mapping
-        from( "timer://foo?repeatCount=1" )
+        RouteDefinition routeDefinition = from( "timer://foo?repeatCount=1" )
             .routeId( "dhis2-te-to-fhir-ques" )
             .setHeader( "Authorization", constant( String.format( "Basic %s", basicAuth ) ) )
             .to( sourceUrl )
@@ -75,10 +79,15 @@ public class TrackedEntityToFhirQuestionnaireRoute extends RouteBuilder
             .marshal().json( JsonLibrary.Jackson )
             .convertBodyTo( String.class )
             .transform( datasonnet( "resource:file:" + tempFile.toAbsolutePath(), String.class ) )
-            .log( "Inserting questionnaire response : ${body}" )
-            .to( "fhir://create/resource?inBody=resourceAsString&client=#fhirClient" )
-            // The body we are getting is a MethodOutcome
-            .log( "Questionnaire response created successfully : ${body.getId().getValue()}" )
-            .log( "Done." );
+            .log( "Inserting questionnaire response : ${body}" );
+
+        if ( !fhirProperties.isDisabled() )
+        {
+            routeDefinition.to( "fhir://create/resource?inBody=resourceAsString&client=#fhirClient" )
+                // The body we are getting is a MethodOutcome
+                .log( "Questionnaire response created successfully : ${body.getId().getValue()}" );
+        }
+
+        routeDefinition.log( "Done." );
     }
 }

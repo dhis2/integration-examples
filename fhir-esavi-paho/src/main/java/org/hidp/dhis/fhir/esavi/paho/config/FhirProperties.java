@@ -43,6 +43,8 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 @ConfigurationProperties( "dhis2-to-fhir.fhir" )
 public class FhirProperties
 {
+    @NotNull
+    private boolean disabled;
 
     @NotNull
     private String serverUrl;
