@@ -1,4 +1,4 @@
-package org.hisp.hisp.dhis.fhir.converters;
+package org.hisp.dhis.fhir.converters;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.Converter;
