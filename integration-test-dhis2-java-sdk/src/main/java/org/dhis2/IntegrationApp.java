@@ -31,11 +31,12 @@ public final class IntegrationApp
         String dataSetId = args[8];
         String period = args[9];
 
-        Dhis2Client sourceDhis2Client = Dhis2ClientBuilder.newClient( sourceDhis2ApiUrl, sourceDhis2ApiUsername, sourceDhis2ApiPassword ).build();
+        Dhis2Client sourceDhis2Client = Dhis2ClientBuilder.newClient( sourceDhis2ApiUrl, sourceDhis2ApiUsername,
+            sourceDhis2ApiPassword ).build();
         // pull data value set from source DHIS2 instance
         DataValueSet dataValueSet = sourceDhis2Client.get( "dataValueSets" )
             .withParameter( "dataSet", dataSetId ).withParameter( "period", period )
-            .withParameter( "orgUnit", sourceOrgUnitId ).transfer().returnAs( DataValueSet.class);
+            .withParameter( "orgUnit", sourceOrgUnitId ).transfer().returnAs( DataValueSet.class );
 
         // replace source org unit IDs with target org unit IDs
         dataValueSet.setOrgUnit( targetOrgUnitId );
@@ -44,7 +45,8 @@ public final class IntegrationApp
             dataValue.setOrgUnit( targetOrgUnitId );
         }
 
-        Dhis2Client targetDhis2Client = Dhis2ClientBuilder.newClient( targetDhis2ApiUrl, targetDhis2ApiUsername, targetDhis2ApiPassword ).build();
+        Dhis2Client targetDhis2Client = Dhis2ClientBuilder.newClient( targetDhis2ApiUrl, targetDhis2ApiUsername,
+            targetDhis2ApiPassword ).build();
         // push data value set to destination DHIS2 instance
         targetDhis2Client.post( "dataValueSets" ).withResource( dataValueSet ).transfer().close();
     }
