@@ -18,6 +18,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class IntegrationAppTestCase
             .dependsOn( postgreSqlContainer )
             .withClasspathResourceMapping( "dhis.conf", "/DHIS2_home/dhis.conf", BindMode.READ_WRITE )
             .withNetwork( postgreSqlContainer.getNetwork() ).withExposedPorts( 8080 )
-            .waitingFor( new HttpWaitStrategy().forStatusCode( 200 ) )
+            .waitingFor( new HttpWaitStrategy().forStatusCode( 200 ).withStartupTimeout( Duration.ofSeconds( 60 ) ) )
             .withEnv( "WAIT_FOR_DB_CONTAINER", "db" + ":" + 5432 + " -t 0" );
     }
 
