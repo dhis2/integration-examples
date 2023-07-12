@@ -1,4 +1,4 @@
-package org.hisp.hisp.dhis.fhir;
+package org.hisp.dhis.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
