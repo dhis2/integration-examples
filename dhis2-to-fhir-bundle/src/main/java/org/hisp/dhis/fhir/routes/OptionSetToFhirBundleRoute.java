@@ -36,9 +36,8 @@ public class OptionSetToFhirBundleRoute extends RouteBuilder
             .unmarshal( jacksonDataFormat )
             .log( "Converting ${body.optionSets.size()} option sets." )
             .convertBodyTo( Bundle.class )
-            // .to( "fhir://transaction/withBundle?client=#fhirClient" )
             .marshal().fhirJson( fhirProperties.getFhirVersion().name(), true )
-            .to( "file:data/fhir-output?filename=optionSets.json" )
+            .to( "fhir://transaction/withBundle?client=#fhirClient" )
             .log( "Done." );
     }
 }

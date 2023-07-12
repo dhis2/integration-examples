@@ -35,9 +35,8 @@ public class TrackedEntityToFhirBundleRoute extends RouteBuilder
             .unmarshal( jacksonDataFormat )
             .log( "Converting ${body.trackedEntities.size()} tracked entities." )
             .convertBodyTo( Bundle.class )
-            .to( "fhir://transaction/withBundle?client=#fhirClient" )
             .marshal().fhirJson( fhirProperties.getFhirVersion().name(), true )
-            .to( "file:data/fhir-output?filename=trackedEntities.json" )
+            .to( "fhir://transaction/withBundle?client=#fhirClient" )
             .log( "Done." );
     }
 }

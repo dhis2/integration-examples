@@ -38,3 +38,4 @@ node_modules
 docker/artifacts
 # ignore local docker override files
 docker-compose.override.yml
+db-dump

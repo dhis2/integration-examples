@@ -12,3 +12,4 @@ dhis2-to-fhir:
   fhir:
     server-url: http://localhost:8081/baseR4
     fhir-version: R4
+
