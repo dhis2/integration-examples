@@ -19,6 +19,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.File;
 import java.net.URL;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 public class AbstractRouteTestCase
 {
@@ -48,6 +49,7 @@ public class AbstractRouteTestCase
             .withDatabaseName( "dhis2" )
             .withNetworkAliases( "db" )
             .withUsername( "dhis" )
+            .withStartupTimeout( Duration.of(15, ChronoUnit.MINUTES) )
             .withPassword( "dhis" ).withNetwork( Network.newNetwork() );
     }
 
@@ -88,12 +90,12 @@ public class AbstractRouteTestCase
             DHIS2_CONTAINER.start();
             FHIR_CONTAINER = newFhirContainer();
             FHIR_CONTAINER.start();
-        }
 
-        System.setProperty( "dhis2-to-fhir.dhis2.base-url",
-            String.format( "http://localhost:%s", DHIS2_CONTAINER.getFirstMappedPort() ) );
-        System.setProperty( "dhis2-to-fhir.fhir.server-url",
-            String.format( "http://localhost:%s/fhir", FHIR_CONTAINER.getFirstMappedPort() ) );
+            System.setProperty( "dhis2-to-fhir.dhis2.base-url",
+                String.format( "http://localhost:%s", DHIS2_CONTAINER.getFirstMappedPort() ) );
+            System.setProperty( "dhis2-to-fhir.fhir.server-url",
+                String.format( "http://localhost:%s/fhir", FHIR_CONTAINER.getFirstMappedPort() ) );
+        }
     }
 
     @BeforeEach
