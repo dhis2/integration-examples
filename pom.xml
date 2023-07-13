@@ -23,7 +23,7 @@
         <module>dhis2-to-fhir-bundle-datasonnet</module>
         <module>fhir-esavi-paho</module>
         <module>integration-test</module>
-        <module>integration-test-dhis2-java-sdk</module>
+        <module>data-value-set-sync-dhis2-java-sdk</module>
     </modules>
 
     <dependencyManagement>
