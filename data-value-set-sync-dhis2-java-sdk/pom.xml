@@ -10,7 +10,7 @@
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>integration-test-java-sdk</artifactId>
+    <artifactId>data-value-set-sync-dhis2-java-sdk</artifactId>
 
     <dependencies>
         <dependency>
