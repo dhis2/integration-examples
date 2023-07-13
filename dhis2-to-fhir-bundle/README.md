@@ -1,5 +1,5 @@
-About this example
-==================
+About
+=====
 
 This Apache Camel application shows how DHIS2 resources can be turned into their FHIR counterparts and pushed as bundles to a FHIR server. Concretely, [organisation units](https://docs.dhis2.org/en/implement/database-design/organisation-units.html) are transformed into [organizations](https://hl7.org/fhir/R4/organization.html), [tracked entities](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-240/tracker.html?h=tracked+entity+2.40#tracked-entity) into [patients](https://hl7.org/fhir/R4/patient.html), and [option sets](https://docs.dhis2.org/en/use/user-guides/dhis-core-version-240/configuring-the-system/metadata.html?h=option+sets+2.40#about_option_set) into [code systems](https://hl7.org/fhir/R4/codesystem.html) as well as [value sets](https://hl7.org/fhir/R4/valueset.html).
 
@@ -13,7 +13,7 @@ This Apache Camel application shows how DHIS2 resources can be turned into their
    
 2. From your terminal, change the current directory to `dhis2-to-fhir-bundle` and run `mvn spring-boot:run`
 
-### UML sequence diagrams
+### UML Sequence Diagrams
 
 ```
                                                            OrgUnitToFhirBundleRoute                                                      
@@ -40,7 +40,7 @@ This Apache Camel application shows how DHIS2 resources can be turned into their
           ║            <───┘                                                             ║                    │                   │      
           ╚════════════╪═════════════════════════════════════════════════════════════════╝                    │                   │      
                        │                                                                                      │                   │      
-                       │                           𝟓 fhir://transaction/withBundle?client=#fhirClient         │                   │      
+                       │                                         𝟓 Create organizations                       │                   │      
                        │─────────────────────────────────────────────────────────────────────────────────────────────────────────>│      
                        │                                                                                      │                   │      
                        │                                                   𝟔                                  │                   │      
@@ -51,39 +51,38 @@ This Apache Camel application shows how DHIS2 resources can be turned into their
 ```
 
 ```
-                                                TrackedEntityToFhirBundleRoute                                            
-                                                                                                                          
-                    ┌─────┐                                                                 ┌─────┐          ┌───────────┐
-                    │Camel│                                                                 │DHIS2│          │FHIR server│
-                    └──┬──┘                                                                 └──┬──┘          └─────┬─────┘
-                       │𝟏 /api/trackedEntityInstances.json?ou=DiszpKrYNg8&program=IpHINAT79UW  │                   │      
-                       │──────────────────────────────────────────────────────────────────────>│                   │      
-                       │                                                                       │                   │      
-                       │                          𝟐 Tracked entities                           │                   │      
-                       │<─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │                   │      
-                       │                                                                       │                   │      
-                       │                                                                       │                   │      
-          ╔═══════╤════╪═════════════════════════════════════════════════════════╗             │                   │      
-          ║ LOOP  │  tracked entities                                            ║             │                   │      
-          ╟───────┘    │                                                         ║             │                   │      
-          ║            ────┐                                                     ║             │                   │      
-          ║                │ 𝟑 Transform tracked entity resource into patient    ║             │                   │      
-          ║            <───┘                                                     ║             │                   │      
-          ║            │                                                         ║             │                   │      
-          ║            ────┐                                                     ║             │                   │      
-          ║                │ 𝟒 Add patient resource to FHIR bundle               ║             │                   │      
-          ║            <───┘                                                     ║             │                   │      
-          ╚════════════╪═════════════════════════════════════════════════════════╝             │                   │      
-                       │                                                                       │                   │      
-                       │                    𝟓 fhir://transaction/withBundle?client=#fhirClient │                   │      
-                       │──────────────────────────────────────────────────────────────────────────────────────────>│      
-                       │                                                                       │                   │      
-                       │                                            𝟔                          │                   │      
-                       │<─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │      
-                    ┌──┴──┐                                                                 ┌──┴──┐          ┌─────┴─────┐
-                    │Camel│                                                                 │DHIS2│          │FHIR server│
-                    └─────┘                                                                 └─────┘          └───────────┘
-
+                                                TrackedEntityToFhirBundleRoute                                           
+                                                                                                                         
+                    ┌─────┐                                                                ┌─────┐          ┌───────────┐
+                    │Camel│                                                                │DHIS2│          │FHIR server│
+                    └──┬──┘                                                                └──┬──┘          └─────┬─────┘
+                       │𝟏 /api/trackedEntityInstances.json?ou=DiszpKrYNg8&program=IpHINAT79UW │                   │      
+                       │─────────────────────────────────────────────────────────────────────>│                   │      
+                       │                                                                      │                   │      
+                       │                         𝟐 Tracked entities                           │                   │      
+                       │<─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│                   │      
+                       │                                                                      │                   │      
+                       │                                                                      │                   │      
+          ╔═══════╤════╪═════════════════════════════════════════════════════════╗            │                   │      
+          ║ LOOP  │  tracked entities                                            ║            │                   │      
+          ╟───────┘    │                                                         ║            │                   │      
+          ║            ────┐                                                     ║            │                   │      
+          ║                │ 𝟑 Transform tracked entity resource into patient    ║            │                   │      
+          ║            <───┘                                                     ║            │                   │      
+          ║            │                                                         ║            │                   │      
+          ║            ────┐                                                     ║            │                   │      
+          ║                │ 𝟒 Add patient resource to FHIR bundle               ║            │                   │      
+          ║            <───┘                                                     ║            │                   │      
+          ╚════════════╪═════════════════════════════════════════════════════════╝            │                   │      
+                       │                                                                      │                   │      
+                       │                                    𝟓 Create patients                 │                   │      
+                       │─────────────────────────────────────────────────────────────────────────────────────────>│      
+                       │                                                                      │                   │      
+                       │                                           𝟔                          │                   │      
+                       │<─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│      
+                    ┌──┴──┐                                                                ┌──┴──┐          ┌─────┴─────┐
+                    │Camel│                                                                │DHIS2│          │FHIR server│
+                    └─────┘                                                                └─────┘          └───────────┘
 ```
 
 ```
@@ -119,7 +118,7 @@ This Apache Camel application shows how DHIS2 resources can be turned into their
           ║            <───┘                                                     ║                                                                 │                   │      
           ╚════════════╪═════════════════════════════════════════════════════════╝                                                                 │                   │      
                        │                                                                                                                           │                   │      
-                       │                                              𝟕 fhir://transaction/withBundle?client=#fhirClient                           │                   │      
+                       │                                                      𝟕 Create code systems & value sets                                   │                   │      
                        │──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────>│      
                        │                                                                                                                           │                   │      
                        │                                                                      𝟖                                                    │                   │      
@@ -143,7 +142,7 @@ loop organisation units
   Camel -> Camel: Transform organisation unit resource into organization
   Camel -> Camel: Add organization resource to FHIR bundle
 end 
-Camel -> "FHIR server": fhir://transaction/withBundle?client=#fhirClient
+Camel -> "FHIR server": Create organizations
 Camel <-- "FHIR server"
 @enduml
 ```
@@ -160,7 +159,7 @@ loop tracked entities
   Camel -> Camel: Transform tracked entity resource into patient
   Camel -> Camel: Add patient resource to FHIR bundle
 end 
-Camel -> "FHIR server": fhir://transaction/withBundle?client=#fhirClient
+Camel -> "FHIR server": Create patients
 Camel <-- "FHIR server"
 @enduml
 ```
@@ -178,7 +177,7 @@ loop option sets
   Camel -> Camel: Add code system resource to FHIR bundle
   Camel -> Camel: Add value set resource to FHIR bundle
 end 
-Camel -> "FHIR server": fhir://transaction/withBundle?client=#fhirClient
+Camel -> "FHIR server": Create code systems & value sets
 Camel <-- "FHIR server"
 @enduml
 ```
