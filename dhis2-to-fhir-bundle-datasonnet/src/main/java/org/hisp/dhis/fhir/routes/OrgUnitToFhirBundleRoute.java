@@ -1,11 +1,10 @@
-package org.hisp.hisp.dhis.fhir.routes;
+package org.hisp.dhis.fhir.routes;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jackson.JacksonDataFormat;
-import org.hisp.hisp.dhis.fhir.config.properties.DhisProperties;
-import org.hisp.hisp.dhis.fhir.config.properties.FhirProperties;
-import org.hisp.hisp.dhis.fhir.domain.OrganisationUnits;
+import org.hisp.dhis.fhir.config.properties.DhisProperties;
+import org.hisp.dhis.fhir.domain.OrganisationUnits;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +16,6 @@ import java.util.Map;
 public class OrgUnitToFhirBundleRoute extends RouteBuilder
 {
     private final DhisProperties dhisProperties;
-
-    private final FhirProperties fhirProperties;
 
     @Override
     public void configure()
@@ -37,7 +34,6 @@ public class OrgUnitToFhirBundleRoute extends RouteBuilder
             .marshal().json()
             .convertBodyTo( String.class )
             .to( "fhir://transaction/withBundle?inBody=stringBundle&client=#fhirClient" )
-            .to( "file:data/fhir-output?filename=orgUnits.json" )
             .log( "Done." );
     }
 }
