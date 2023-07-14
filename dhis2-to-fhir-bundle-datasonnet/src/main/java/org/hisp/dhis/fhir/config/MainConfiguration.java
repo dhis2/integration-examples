@@ -1,7 +1,7 @@
-package org.hisp.hisp.dhis.fhir.config;
+package org.hisp.dhis.fhir.config;
 
 import lombok.RequiredArgsConstructor;
-import org.hisp.hisp.dhis.fhir.config.properties.DhisProperties;
+import org.hisp.dhis.fhir.config.properties.DhisProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
