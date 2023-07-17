@@ -7,5 +7,5 @@ The catalogued examples include:
 * [DHIS2 organisation units, option sets, and tracked entities to their FHIR counterparts](dhis2-to-fhir-bundle/README.md)
 * [DHIS2 organisation units to its FHIR counterpart using DataSonnet for mapping the resources](dhis2-to-fhir-bundle-datasonnet/README.md)
 * [Data value set synchronisation between two DHIS2 instances using the DHIS2 Java SDK](data-value-set-sync-dhis2-java-sdk/README.md)
-* [DHIS2 tracked entities to FHIR question responses](fhir-esavi-paho/README.md)
+* [DHIS2 tracked entities to FHIR questionnaire responses](fhir-esavi-paho/README.md)
 * [Automating DHIS2 integration testing](integration-test/README.md)
