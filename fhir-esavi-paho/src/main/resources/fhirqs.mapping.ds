@@ -17,14 +17,14 @@ local dataElementsMap = {
 // http://hl7.org/fhir/R4/valueset-administrative-gender.html
 // https://dev.paho-dhis2.org/api/optionSets/WDUwjiW2rGH.json?fields=options[code,name]
 local genderMap = {
-  "1": "male",
-  "2": "female",
-  "3": "other"
+  "MALE": "male",
+  "FEMALE": "female",
+  "OTHER": "other"
 };
 local genderMapDisplay = {
-  "1": "Male",
-  "2": "Female",
-  "3": "Other"
+  "MALE": "Male",
+  "FEMALE": "Female",
+  "OTHER": "Other"
 };
 
 // util functions
@@ -37,7 +37,7 @@ local get(obj, field, default) = if std.objectHas(obj, field) then obj[field] el
 local appendTimeToDate(str) = std.join("T",[str,"00:00:00"]);
 
 // This util function can be used to convert DHIS2 dates to fhir compatible dates
-local formatDate(str) = DS.LocalDateTime.format(str, "dd-MM-yyyy'T'HH:mm:ss", "yyyy-MM-dd");
+local formatDate(str) = DS.LocalDateTime.format(str, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd");
 
 // Preprocessing
 

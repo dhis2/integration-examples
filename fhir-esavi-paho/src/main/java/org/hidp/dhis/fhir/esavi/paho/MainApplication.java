@@ -59,6 +59,7 @@ public class MainApplication
     @Bean
     public IGenericClient fhirClient( FhirContext fhirContext )
     {
+        fhirContext.getRestfulClientFactory().setSocketTimeout( 50000 );
         return fhirContext.newRestfulGenericClient( fhirProperties.getServerUrl() );
     }
 }

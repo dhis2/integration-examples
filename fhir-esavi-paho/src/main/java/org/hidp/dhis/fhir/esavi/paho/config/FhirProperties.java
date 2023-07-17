@@ -44,9 +44,6 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 public class FhirProperties
 {
     @NotNull
-    private boolean disabled;
-
-    @NotNull
     private String serverUrl;
 
     @NotNull

@@ -9,6 +9,7 @@ dhis2-to-fhir:
     base-url: https://dev.paho-dhis2.org/
     username: integration
     password: ${DHIS2_PASSWORD}
+    org-unit-id: ${DHIS2_ORG_UNIT_ID}
   fhir:
     server-url: http://localhost:8080/fhir/
     fhir-version: R4

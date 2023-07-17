@@ -5,7 +5,7 @@ This Apache Camel application shows how DHIS2 resources can be mapped into their
 
 ### How to run
 
-1. Open `dhis2-to-fhir-bundle/src/main/resources/application.yml` and set:
+1. Open `dhis2-to-fhir-bundle-datasonnet/src/main/resources/application.yml` and set:
    1. `dhis2-to-fhir.dhis2.base-url` to the DHIS2 server's address
    2. `dhis2-to-fhir.dhis2.username` to the DHIS2 account username
    3. `dhis2-to-fhir.dhis2.password` to the DHIS2 account password
