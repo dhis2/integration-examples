@@ -49,4 +49,7 @@ public class DhisProperties
 
     @NotNull
     private String password;
+
+    @NotNull
+    private String orgUnitId;
 }
