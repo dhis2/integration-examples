@@ -2,7 +2,7 @@ This project is a catalogue of code examples illustrating how one can integrate 
 
 Different technologies such as Apache Camel are used to demonstrate the integrations though these examples are meant to offer guidance and not serve as best practices. It should be highlighted that the code is not intended for production use so the necessary code reviews should be performed prior to running it on a production environment.
 
-The examples covered include:
+The catalogued examples covered include:
 
 * [DHIS2 organisation units, option sets, and tracked entities to their FHIR counterparts](dhis2-to-fhir-bundle/README.md)
 * [DHIS2 organisation units to its FHIR counterpart using DataSonnet for mapping the resources](dhis2-to-fhir-bundle-datasonnet/README.md)
