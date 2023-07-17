@@ -11,7 +11,7 @@ The PoC was developed in collaboration with the [Pan American Health Organizatio
    1. `dhis2-to-fhir.dhis2.base-url` to the DHIS2 server's address
    2. `dhis2-to-fhir.dhis2.username` to the DHIS2 account username
    3. `dhis2-to-fhir.dhis2.password` to the DHIS2 account password
-   4. `dhis2-to-fhir.dhis2.org-unit-ud` to the ID of the DHIS2 organisation unit to which the tracked entities belong to
+   4. `dhis2-to-fhir.dhis2.org-unit-id` to the ID of the DHIS2 organisation unit to which the tracked entities belong to
    5. `dhis2-to-fhir.fhir.server-url` to the FHIR server's address
    
 2. From your terminal, change the current directory to `fhir-esave-paho` and run `mvn spring-boot:run`
