@@ -92,7 +92,7 @@ public class AbstractRouteTestCase
             FHIR_CONTAINER.start();
 
             System.setProperty( "dhis2-to-fhir.dhis2.base-url",
-                String.format( "http://localhost:%s", DHIS2_CONTAINER.getFirstMappedPort() ) );
+                String.format( "http://localhost:%s/api", DHIS2_CONTAINER.getFirstMappedPort() ) );
             System.setProperty( "dhis2-to-fhir.fhir.server-url",
                 String.format( "http://localhost:%s/fhir", FHIR_CONTAINER.getFirstMappedPort() ) );
         }

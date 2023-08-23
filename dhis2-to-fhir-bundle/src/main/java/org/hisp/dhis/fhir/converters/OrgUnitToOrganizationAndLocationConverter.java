@@ -4,11 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.camel.Converter;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConverters;
-import org.apache.camel.component.fhir.internal.FhirConstants;
+import org.hisp.dhis.api.model.v2_39_1.OrganisationUnit;
 import org.hisp.dhis.fhir.config.properties.DhisProperties;
-import org.hisp.dhis.fhir.domain.OrganisationUnit;
-import org.hisp.dhis.fhir.domain.OrganisationUnits;
-import org.hl7.fhir.r4.model.Bundle;
+import org.hisp.dhis.fhir.domain.OrganizationAndLocation;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
@@ -17,61 +15,43 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Reference;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 import static org.springframework.util.StringUtils.hasText;
 
 @Component
 @RequiredArgsConstructor
-public class OrgUnitToFhirBundleConverter implements TypeConverters
+public class OrgUnitToOrganizationAndLocationConverter implements TypeConverters
 {
     private final DhisProperties dhisProperties;
 
     @Converter
-    public Bundle ouToBundle( OrganisationUnits organisationUnits, Exchange exchange ) throws IOException
+    public OrganizationAndLocation orgUnitToOrganizationAndLocation( OrganisationUnit organisationUnit,
+        Exchange exchange )
     {
-        Bundle bundle = new Bundle().setType( Bundle.BundleType.TRANSACTION );
+        Organization organization = createOrganization( organisationUnit );
+        Location location = createLocation( organisationUnit );
 
-        for ( OrganisationUnit organisationUnit : organisationUnits.getOrganisationUnits() )
-        {
-            Organization organization = createOrganization( organisationUnit );
-            Location location = createLocation( organisationUnit );
-
-            bundle.addEntry().setResource( organization )
-                .getRequest().setUrl( "Organization?identifier=" + organization.getId() )
-                .setMethod( Bundle.HTTPVerb.POST )
-                .setIfNoneExist( "identifier=" + organization.getId() );
-
-            bundle.addEntry().setResource( location )
-                .getRequest().setUrl( "Location?identifier=" + location.getId() )
-                .setMethod( Bundle.HTTPVerb.POST )
-                .setIfNoneExist( "identifier=" + location.getId() );
-        }
-
-        exchange.getIn().setHeader( FhirConstants.PROPERTY_PREFIX + "bundle", bundle );
-
-        return bundle;
+        return new OrganizationAndLocation( organization, location );
     }
 
     private Location createLocation( OrganisationUnit organisationUnit )
     {
         // https://www.hl7.org/fhir/location.html
         Location location = new Location();
-        location.setId( organisationUnit.getId() );
-        location.setName( organisationUnit.getName() );
+        location.setId( organisationUnit.getId().get() );
+        location.setName( organisationUnit.getName().get() );
         location.setStatus( Location.LocationStatus.ACTIVE );
         location.setMode( Location.LocationMode.INSTANCE );
 
         String namespace = dhisProperties.getBaseUrl() + "/api/organisationUnits";
 
         location.getIdentifier().add(
-            new Identifier().setSystem( namespace ).setValue( organisationUnit.getId() )
+            new Identifier().setSystem( namespace ).setValue( organisationUnit.getId().get() )
         );
 
-        if ( hasText( organisationUnit.getCode() ) )
+        if ( hasText( organisationUnit.getCode().orElse( null ) ) )
         {
             location.getIdentifier().add(
-                new Identifier().setSystem( namespace ).setValue( organisationUnit.getCode() )
+                new Identifier().setSystem( namespace ).setValue( organisationUnit.getCode().get() )
             );
         }
 
@@ -83,11 +63,11 @@ public class OrgUnitToFhirBundleConverter implements TypeConverters
             .setSystem( "http://terminology.hl7.org/CodeSystem/location-physical-type" )
             .setCode( "si" );
 
-        location.setManagingOrganization( new Reference( "Organization/" + organisationUnit.getId() ) );
+        location.setManagingOrganization( new Reference( "Organization/" + organisationUnit.getId().get() ) );
 
-        if ( organisationUnit.getParent() != null )
+        if ( organisationUnit.getParent().isPresent() )
         {
-            location.setPartOf( new Reference( "Location/" + organisationUnit.getParent().getId() ) );
+            location.setPartOf( new Reference( "Location/" + organisationUnit.getParent().get().getId().get() ) );
         }
 
         // TODO add geometry using extension http://hl7.org/fhir/StructureDefinition/location-boundary-geojson
@@ -99,19 +79,19 @@ public class OrgUnitToFhirBundleConverter implements TypeConverters
     {
         // https://www.hl7.org/fhir/organization.html
         Organization organization = new Organization();
-        organization.setId( organisationUnit.getId() );
-        organization.setName( organisationUnit.getName() );
+        organization.setId( organisationUnit.getId().get() );
+        organization.setName( organisationUnit.getName().get() );
 
         String namespace = dhisProperties.getBaseUrl() + "/api/organisationUnits";
 
         organization.getIdentifier().add(
-            new Identifier().setSystem( namespace ).setValue( organisationUnit.getId() )
+            new Identifier().setSystem( namespace ).setValue( organisationUnit.getId().get() )
         );
 
-        if ( hasText( organisationUnit.getCode() ) )
+        if ( hasText( organisationUnit.getCode().orElse( null ) ) )
         {
             organization.getIdentifier().add(
-                new Identifier().setSystem( namespace ).setValue( organisationUnit.getCode() )
+                new Identifier().setSystem( namespace ).setValue( organisationUnit.getCode().get() )
             );
         }
 

@@ -1,7 +1,12 @@
 About
 =====
 
-This Apache Camel application shows how DHIS2 resources can be turned into their FHIR counterparts and pushed as bundles to a FHIR server. Concretely, [organisation units](https://docs.dhis2.org/en/implement/database-design/organisation-units.html) are transformed into [organizations](https://hl7.org/fhir/R4/organization.html), [tracked entities](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-240/tracker.html?h=tracked+entity+2.40#tracked-entity) into [patients](https://hl7.org/fhir/R4/patient.html), and [option sets](https://docs.dhis2.org/en/use/user-guides/dhis-core-version-240/configuring-the-system/metadata.html?h=option+sets+2.40#about_option_set) into [code systems](https://hl7.org/fhir/R4/codesystem.html) as well as [value sets](https://hl7.org/fhir/R4/valueset.html).
+This Apache Camel application shows how DHIS2 resources can be turned into their FHIR counterparts and pushed as bundles to a FHIR server. Concretely, the [Camel DHIS2 component](https://camel.apache.org/components/4.0.x/dhis2-component.html) is used to fetch [organisation units](https://docs.dhis2.org/en/implement/database-design/organisation-units.html), [tracked entities](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-240/tracker.html?h=tracked+entity+2.40#tracked-entity), and [option sets](https://docs.dhis2.org/en/use/user-guides/dhis-core-version-240/configuring-the-system/metadata.html?h=option+sets+2.40#about_option_set) from DHIS2. Thanks to [Camel's type converters](https://camel.apache.org/manual/type-converter.html), the fetched resources are transformed as follows: 
+
+* Organisation units into [organizations](https://hl7.org/fhir/R4/organization.html) and [locations](https://hl7.org/fhir/R4/location.html)
+* Tracked entities into [patients](https://hl7.org/fhir/R4/patient.html)
+* Option sets into [code systems](https://hl7.org/fhir/R4/codesystem.html) and [value sets](https://hl7.org/fhir/R4/valueset.html)
+
 
 ### How to run
 
