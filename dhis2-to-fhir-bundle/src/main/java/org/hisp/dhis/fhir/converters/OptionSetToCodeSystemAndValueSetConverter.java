@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.apache.camel.Converter;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConverters;
-import org.apache.camel.component.fhir.internal.FhirConstants;
+import org.hisp.dhis.api.model.v2_39_1.Option;
+import org.hisp.dhis.api.model.v2_39_1.OptionSet;
 import org.hisp.dhis.fhir.config.properties.DhisProperties;
-import org.hisp.dhis.fhir.domain.Option;
-import org.hisp.dhis.fhir.domain.OptionSet;
-import org.hisp.dhis.fhir.domain.OptionSets;
-import org.hl7.fhir.r4.model.Bundle;
+import org.hisp.dhis.fhir.domain.CodeSystemAndValueSet;
 import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Identifier;
@@ -20,30 +18,17 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Component
 @RequiredArgsConstructor
-public class OptionSetToFhirBundleConverter implements TypeConverters
+public class OptionSetToCodeSystemAndValueSetConverter implements TypeConverters
 {
     private final DhisProperties dhisProperties;
 
     @Converter
-    public Bundle osToFhirBundle( OptionSets optionSets, Exchange exchange )
+    public CodeSystemAndValueSet optionSetToCodeSystemAndValueSet( OptionSet optionSet, Exchange exchange )
     {
-        Bundle bundle = new Bundle().setType( Bundle.BundleType.TRANSACTION );
+        CodeSystem codeSystem = createCodeSystem( optionSet );
+        ValueSet valueSet = createValueSet( optionSet );
 
-        for ( OptionSet optionSet : optionSets.getOptionSets() )
-        {
-            CodeSystem codeSystem = createCodeSystem( optionSet );
-            ValueSet valueSet = createValueSet( optionSet );
-
-            bundle.addEntry().setResource( codeSystem )
-                .getRequest().setUrl( "CodeSystem?identifier=" + codeSystem.getId() ).setMethod( Bundle.HTTPVerb.PUT );
-
-            bundle.addEntry().setResource( valueSet )
-                .getRequest().setUrl( "ValueSet?identifier=" + valueSet.getId() ).setMethod( Bundle.HTTPVerb.PUT );
-        }
-
-        exchange.getIn().setHeader( FhirConstants.PROPERTY_PREFIX + "bundle", bundle );
-
-        return bundle;
+        return new CodeSystemAndValueSet( codeSystem, valueSet );
     }
 
     private CodeSystem createCodeSystem( OptionSet optionSet )
@@ -51,12 +36,12 @@ public class OptionSetToFhirBundleConverter implements TypeConverters
         String namespace = dhisProperties.getBaseUrl() + "/api/optionSets";
 
         CodeSystem codeSystem = new CodeSystem();
-        codeSystem.setId( optionSet.getId() );
+        codeSystem.setId( optionSet.getId().get() );
         codeSystem.setUrl( namespace + "/" + optionSet.getId() + "/codeSystem" );
         codeSystem.setValueSet( namespace + "/" + optionSet.getId() + "/valueSet" );
-        codeSystem.setName( optionSet.getName() );
-        codeSystem.setTitle( optionSet.getName() );
-        codeSystem.setDescription( optionSet.getDescription() );
+        codeSystem.setName( optionSet.getName().get() );
+        codeSystem.setTitle( optionSet.getName().get() );
+        codeSystem.setDescription( (String) optionSet.getAdditionalProperties().get( "description" ) );
         codeSystem.setPublisher( dhisProperties.getBaseUrl() );
         codeSystem.setStatus( Enumerations.PublicationStatus.ACTIVE );
         codeSystem.setContent( CodeSystem.CodeSystemContentMode.COMPLETE );
@@ -65,22 +50,22 @@ public class OptionSetToFhirBundleConverter implements TypeConverters
         codeSystem.setCaseSensitive( true );
 
         codeSystem.getIdentifier().add(
-            new Identifier().setSystem( namespace ).setValue( optionSet.getId() )
+            new Identifier().setSystem( namespace ).setValue( optionSet.getId().get() )
         );
 
-        if ( hasText( optionSet.getCode() ) )
+        if ( hasText( optionSet.getCode().orElse( null ) ) )
         {
             codeSystem.getIdentifier().add(
-                new Identifier().setSystem( namespace ).setValue( optionSet.getCode() )
+                new Identifier().setSystem( namespace ).setValue( optionSet.getCode().get() )
             );
         }
 
-        for ( Option option : optionSet.getOptions() )
+        for ( Option option : optionSet.getOptions().get() )
         {
             codeSystem.addConcept()
-                .setDisplay( option.getName() )
-                .setDefinition( option.getName() )
-                .setCode( option.getCode() );
+                .setDisplay( option.getName().get() )
+                .setDefinition( option.getName().get() )
+                .setCode( option.getCode().orElse( null ) );
         }
 
         return codeSystem;
@@ -91,29 +76,30 @@ public class OptionSetToFhirBundleConverter implements TypeConverters
         String namespace = dhisProperties.getBaseUrl() + "/api/optionSets";
 
         ValueSet valueSet = new ValueSet();
-        valueSet.setId( optionSet.getId() );
+        valueSet.setId( optionSet.getId().get() );
         valueSet.setUrl( namespace + "/" + optionSet.getId() + "/valueSet" );
-        valueSet.setName( optionSet.getName() );
-        valueSet.setTitle( optionSet.getName() );
-        valueSet.setDescription( optionSet.getDescription() );
+        valueSet.setName( optionSet.getName().get() );
+        valueSet.setTitle( optionSet.getName().get() );
+        valueSet.setDescription( (String) optionSet.getAdditionalProperties().get( "description" ) );
         valueSet.setStatus( Enumerations.PublicationStatus.ACTIVE );
         valueSet.setVersion( String.valueOf( optionSet.getVersion() ) );
         valueSet.setExperimental( false );
         valueSet.setImmutable( true );
 
         valueSet.getIdentifier().add(
-            new Identifier().setSystem( namespace ).setValue( optionSet.getId() )
+            new Identifier().setSystem( namespace ).setValue( optionSet.getId().get() )
         );
 
-        if ( hasText( optionSet.getCode() ) )
+        if ( hasText( optionSet.getCode().orElse( null ) ) )
         {
             valueSet.getIdentifier().add(
-                new Identifier().setSystem( namespace ).setValue( optionSet.getCode() )
+                new Identifier().setSystem( namespace ).setValue( optionSet.getCode().get() )
             );
         }
 
         valueSet.setCompose( new ValueSet.ValueSetComposeComponent()
-            .addInclude( new ValueSet.ConceptSetComponent().setSystem( namespace + "/" + optionSet.getId() + "/codeSystem" ) ) );
+            .addInclude(
+                new ValueSet.ConceptSetComponent().setSystem( namespace + "/" + optionSet.getId() + "/codeSystem" ) ) );
 
         return valueSet;
     }

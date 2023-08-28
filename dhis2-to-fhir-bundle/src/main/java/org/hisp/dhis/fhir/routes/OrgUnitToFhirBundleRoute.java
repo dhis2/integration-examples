@@ -2,41 +2,30 @@ package org.hisp.dhis.fhir.routes;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.jackson.JacksonDataFormat;
-import org.hisp.dhis.fhir.config.properties.DhisProperties;
+import org.hisp.dhis.api.model.v2_39_1.OrganisationUnit;
+import org.hisp.dhis.fhir.aggregate.OrganizationAndLocationBundleAggregationStrategy;
 import org.hisp.dhis.fhir.config.properties.FhirProperties;
-import org.hisp.dhis.fhir.domain.OrganisationUnits;
-import org.hl7.fhir.r4.model.Bundle;
-import org.springframework.http.HttpHeaders;
+import org.hisp.dhis.fhir.domain.OrganizationAndLocation;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
 public class OrgUnitToFhirBundleRoute extends RouteBuilder
 {
-    private final DhisProperties dhisProperties;
-
     private final FhirProperties fhirProperties;
 
     @Override
     public void configure()
     {
-        String sourceUrl = dhisProperties.getBaseUrl() + "/api/organisationUnits.json?fields=id,code,name,description,parent[id]&paging=false";
-        String basicAuth = HttpHeaders.encodeBasicAuth( dhisProperties.getUsername(), dhisProperties.getPassword(), StandardCharsets.UTF_8 );
-
-        JacksonDataFormat jacksonDataFormat = new JacksonDataFormat( OrganisationUnits.class );
-        jacksonDataFormat.setPrettyPrint( true );
-
         from( "timer://foo?repeatCount=1" ).routeId( "dhis2-ou-to-fhir-bundle" )
-            .setHeader( "Authorization", constant( String.format( "Basic %s", basicAuth ) ) )
-            .to( sourceUrl )
-            .unmarshal( jacksonDataFormat )
-            .log( "Converting ${body.organisationUnits.size()} organisation units." )
-            .convertBodyTo( Bundle.class )
+            .to("dhis2://get/collection?path=organisationUnits&arrayName=organisationUnits&fields=id,code,name,description,parent[id]&client=#dhis2Client")
+            .log( "Converting DHIS2 organisation units to FHIR organizations and locations..." )
+            .split().body().aggregationStrategy( new OrganizationAndLocationBundleAggregationStrategy() )
+                .convertBodyTo( OrganisationUnit.class )
+                .convertBodyTo( OrganizationAndLocation.class )
+            .end()
             .marshal().fhirJson( fhirProperties.getFhirVersion().name(), true )
             .to( "fhir://transaction/withBundle?client=#fhirClient" )
-            .log( "Done." );
+            .log( "Saved organizations and locations FHIR bundle" );
     }
 }
