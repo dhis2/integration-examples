@@ -1,0 +1,38 @@
+map "https://dhis2.org/fhir/StructureMap/TrackedEntityToBundle" = "Tracked Entity to Bundle Conversion"
+
+uses "https://dhis2.org/StructureDefinition/tracked-entity-logical-model" alias TrackedEntityLogicalModel as source
+uses "http://hl7.org/fhir/StructureDefinition/Bundle" alias Bundle as target
+uses "http://hl7.org/fhir/StructureDefinition/BackboneElement" alias BackboneElement as target
+uses "http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse" alias QuestionnaireResponse as target
+uses "http://hl7.org/fhir/StructureDefinition/Meta" alias Meta as target
+uses "http://hl7.org/fhir/StructureDefinition/Narrative" alias Narrative as target
+uses "http://hl7.org/fhir/StructureDefinition/Identifier" alias Identifier as target
+
+group trackedEntityToBundle(source trackedEntity : TrackedEntityLogicalModel, target bundle : Bundle) {
+  trackedEntity -> bundle.type = 'batch' "type";
+  trackedEntity as te ->  ('A03MvHHogjR') as birthProgramStageId,  
+    evaluate(te, te.attributes.where(attribute = 'w75KJ2mc4zz').first().value) as name,  
+    evaluate(te, te.enrollments.first().repeat(events).where(programStage = birthProgramStageId).first().createdAt) as createdAt,  
+    bundle.entry as e then {
+      te -> e.resource = create('QuestionnaireResponse') as qr then questionnaireResponse(createdAt, name, te, qr) "resource";
+      te.trackedEntity as id ->  e.request = create('BackboneElement') as request, request.method = 'PUT',  request.url = append('QuestionnaireResponse?identifier=', id) "request";
+  } "bundle";
+}
+
+group questionnaireResponse(source createdAt : dateTime, source name : string, source trackedEntity : TrackedEntityLogicalModel, target qr : QuestionnaireResponse) {
+  trackedEntity.trackedEntity as id -> qr.id = id;
+  trackedEntity ->  qr.meta = create('Meta') as meta, meta.profile = 'https://dhis2.org/fhir/StructureDefinition/QuestionnaireResponse' "meta";
+  trackedEntity -> qr.text = create('Narrative') as narrative then narrative(name, trackedEntity, narrative) "text";
+  trackedEntity -> qr.identifier = create('Identifier') as identifier then identifier(name, trackedEntity, identifier) "identifier";
+  trackedEntity -> qr.questionnaire = 'https://dhis2.org/fhir/Questionnaire' "questionnaire";
+  trackedEntity -> qr.status = 'completed' "status";
+  createdAt -> qr.authored = createdAt "authored";
+}
+
+group identifier(source name : string, source trackedEntity : TrackedEntityLogicalModel, target identifier : Identifier) {
+  trackedEntity as te ->  identifier.system = 'http://dhis2.org/esavi/PRY', identifier.value = name "identifier";
+}
+
+group narrative(source name : string, source trackedEntity : TrackedEntityLogicalModel, target narrative : Narrative) {
+  trackedEntity ->  narrative.status = 'generated',  narrative.div = append('<div xmlns=\"\"\"\"http://www.w3.org/1999/xhtml\"\"\"\">Name ', name, '</div>') "narrative";
+}

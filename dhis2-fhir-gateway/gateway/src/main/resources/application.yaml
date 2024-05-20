@@ -1,0 +1,48 @@
+server:
+  port: 8080
+  address: 127.0.0.1
+  error:
+    whitelabel:
+      enabled: false
+  servlet:
+    session:
+      cookie:
+        same-site: strict
+
+camel:
+  springboot:
+    main-run-controller: true
+  dataformat:
+    json-jackson:
+      auto-discover-object-mapper: true
+  servlet:
+    mapping:
+      context-path: "/api/*"
+
+dhis2:
+  apiUrl: https://play.im.dhis2.org/stable-2-40-3-1/api
+  username: admin
+  password: district
+
+management:
+  endpoints:
+    web:
+      base-path: /management
+      exposure:
+        include: '*'
+  health:
+    show-details: always
+
+spring:
+  jmx:
+    enabled: true
+  security:
+    user:
+      roles: admin,viewer
+
+hawtio:
+  authenticationEnabled: false
+
+logging:
+  file:
+    name: dhis2-fhir-gateway.log
