@@ -1,7 +1,6 @@
 target
 *.log
 *.log.*
-./taret
 ./target
 ./target/classes
 target/**
@@ -38,4 +37,4 @@ node_modules
 docker/artifacts
 # ignore local docker override files
 docker-compose.override.yml
-db-dump
+.db-dump

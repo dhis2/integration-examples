@@ -1,0 +1,81 @@
+- rest:
+    get:
+    - id: "metadata"
+      path: "/metadata"
+      produces: "application/fhir+json"
+      param:
+      - collectionFormat: "multi"
+        dataType: "string"
+        description: "Specify alternative response formats by their MIME-types (when\
+          \ a client is unable acccess accept: header)"
+        name: "_format"
+        required: false
+        type: "query"
+      - collectionFormat: "multi"
+        dataType: "boolean"
+        description: "Ask for a pretty printed response for human convenience"
+        name: "_pretty"
+        required: false
+        type: "query"
+      - collectionFormat: "multi"
+        dataType: "string"
+        description: "Requests the server to return a designated subset of the resource"
+        name: "_summary"
+        required: false
+        type: "query"
+        allowableValues:
+        - "true"
+        - "text"
+        - "data"
+        - "count"
+        - "false"
+      - collectionFormat: "csv"
+        dataType: "array"
+        description: "Requests the server to return a collection of elements from\
+          \ the resource"
+        name: "_elements"
+        required: false
+        type: "query"
+      to: "direct:metadata"
+    - id: "readQuestionnaireResponse"
+      path: "/QuestionnaireResponse/{rid}"
+      produces: "application/fhir+json"
+      param:
+      - dataType: "string"
+        description: "id of the resource (=Resource.id)"
+        name: "rid"
+        required: true
+        type: "path"
+      - collectionFormat: "multi"
+        dataType: "string"
+        description: "Requests the server to return a designated subset of the resource"
+        name: "_summary"
+        required: false
+        type: "query"
+        allowableValues:
+        - "true"
+        - "text"
+        - "data"
+        - "count"
+        - "false"
+      - collectionFormat: "multi"
+        dataType: "string"
+        description: "Specify alternative response formats by their MIME-types (when\
+          \ a client is unable acccess accept: header)"
+        name: "_format"
+        required: false
+        type: "query"
+      - collectionFormat: "multi"
+        dataType: "boolean"
+        description: "Ask for a pretty printed response for human convenience"
+        name: "_pretty"
+        required: false
+        type: "query"
+      - collectionFormat: "csv"
+        dataType: "array"
+        description: "Requests the server to return a collection of elements from\
+          \ the resource"
+        name: "_elements"
+        required: false
+        type: "query"
+      to: "direct:readQuestionnaireResponse"
