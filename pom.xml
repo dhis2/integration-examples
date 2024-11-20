@@ -24,6 +24,7 @@
         <module>fhir-esavi-paho</module>
         <module>integration-test</module>
         <module>data-value-set-sync-dhis2-java-sdk</module>
+        <module>dhis2-fhir-gateway/gateway</module>
     </modules>
 
     <dependencyManagement>

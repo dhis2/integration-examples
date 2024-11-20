@@ -1,0 +1,15 @@
+- from:
+    uri: direct:readQuestionnaireResponse
+    steps:
+      - setHeader:
+          name: CamelDhis2.queryParams
+          groovy: "['program': 'IpHINAT79UW', 'ouMode': 'ACCESSIBLE']"
+      - toD:
+          uri: dhis2:get/resource
+          parameters:
+            path: tracker/trackedEntities/${header.rid}
+            fields: '*'
+            client: '#dhis2Client'
+      - transform:
+          method:
+            beanType: org.hisp.dhis.integration.fhir.FhirMapper

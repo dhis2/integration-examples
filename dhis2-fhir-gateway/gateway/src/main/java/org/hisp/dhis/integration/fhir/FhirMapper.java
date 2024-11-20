@@ -1,17 +1,21 @@
 package org.hisp.dhis.integration.fhir;
 
-import org.apache.camel.*;
-import org.hl7.fhir.r5.elementmodel.*;
+import org.apache.camel.Exchange;
+import org.apache.camel.Expression;
+import org.apache.camel.RuntimeCamelException;
+import org.hl7.fhir.r5.elementmodel.Element;
+import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.IParser;
-import org.hl7.fhir.utilities.*;
-import org.hl7.fhir.validation.*;
-import org.springframework.stereotype.Component;
+import org.hl7.fhir.utilities.ByteProvider;
+import org.hl7.fhir.utilities.VersionUtilities;
+import org.hl7.fhir.validation.IgLoader;
+import org.hl7.fhir.validation.ValidationEngine;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-@Component
 public class FhirMapper implements Expression {
 
     private final ValidationEngine validationEngine;
