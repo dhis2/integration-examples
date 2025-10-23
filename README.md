@@ -9,3 +9,4 @@ The catalogued examples include:
 * [Data value set synchronisation between two DHIS2 instances using the DHIS2 Java SDK](data-value-set-sync-dhis2-java-sdk/README.md)
 * [DHIS2 tracked entities to FHIR questionnaire responses](fhir-esavi-paho/README.md)
 * [Automating DHIS2 integration testing](integration-test/README.md)
+* [Generating a FHIR IPS Patient based on DHIS2 tracked entitites ](dhis2-to-fhir-patient-bundle-datasonnet/README.md)

@@ -1,0 +1,95 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Device",
+        "identifier": [
+          {
+            "system": "http://fhir.health.gov.lk/ips/identifier/system-id",
+            "value": "5b21b377-f424-48c1-8c24-1980b4d00059"
+          }
+        ],
+        "status": "active",
+        "version": [
+            {
+              "type": {
+                "coding": [
+                  {
+                  "code": "DHIS",
+                  "display": "DHIS2",
+                  "version": "2.42.1"
+                  }
+                ]
+              },
+              "value": "2.42.1"
+            }
+        ],
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "706689003",
+              "display": "Application programme software"
+            }
+          ]
+        },
+        "owner": {
+          "reference": "Organization/org-1"
+        },
+        "location": {
+          "reference": "Location/location-1"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Device?identifier=http://fhir.health.gov.lk/ips/identifier/system-id|5b21b377-f424-48c1-8c24-1980b4d00059"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Organization",
+        "id": "org-1",
+        "name": "HISP Sri Lanka",
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/organization-type",
+                "code": "prov",
+                "display": "Healthcare Provider"
+              }
+            ]
+          }
+        ],
+        "address": [
+          {
+            "text": "Colombo, Sri Lanka"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Organization/org-1"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "location-1",
+        "name": "HISP Sri Lanka Main Office",
+        "managingOrganization": {
+          "reference": "Organization/org-1"
+        },
+        "address": {
+          "text": "Colombo, Sri Lanka"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Location/location-1"
+      }
+    }
+  ]
+}

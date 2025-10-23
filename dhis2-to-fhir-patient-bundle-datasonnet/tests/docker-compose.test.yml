@@ -1,0 +1,6 @@
+services:
+  ehr:
+    ports:
+      - "8081:8080"
+    networks:
+      - default

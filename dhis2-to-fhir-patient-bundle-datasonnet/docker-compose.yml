@@ -1,0 +1,181 @@
+services:
+  dhis2:
+    image: "${DHIS2_IMAGE:-dhis2/core:42.1.0}"
+    restart: always
+    volumes:
+      - ./config/dhis2/dhis.conf:/opt/dhis2/dhis.conf:ro
+    environment:
+      JAVA_OPTS: "-Dcontext.path='${DHIS2_CORE_CONTEXT_PATH:-}' -Dlog4j2.configurationFile=/opt/dhis2/log4j2.xml"
+    depends_on:
+      dhis2-db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q -S -O /dev/null http://127.0.0.1:8080/dhis-web-login/ 2>&1| grep -q 'HTTP.*200'" ]
+      start_period: 120s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - dhis2
+      - dhis2-db
+
+  dhis2-db:
+    image: ghcr.io/baosystems/postgis:13-3.4
+    restart: always
+    volumes:
+      - ./db-dump:/docker-entrypoint-initdb.d/:ro
+      - ./config/dhis2/postgresql.conf:/etc/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql.conf
+    environment:
+      POSTGRES_USER: dhis
+      POSTGRES_DB: dhis
+      POSTGRES_PASSWORD: &postgres_password dhis
+      PGPASSWORD: *postgres_password # needed by psql in healthcheck
+    healthcheck:
+      test: [ "CMD-SHELL", "psql --no-password --quiet --username $$POSTGRES_USER postgres://127.0.0.1/$$POSTGRES_DB -p 5432 --command \"SELECT 'ok'\" > /dev/null" ]
+      start_period: 120s
+      interval: 1s
+      timeout: 3s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - dhis2-db
+
+  reverse-proxy:
+    image: nginx:stable-alpine3.21-slim
+    restart: always
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q -S -O /dev/null http://127.0.0.1/api/system/info 2>&1 | grep -q 'HTTP.*200'" ]
+      start_period: 120s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "${DHIS2_PORT:-8080}:80"
+    volumes:
+      - ./config/dhis2/nginx.conf:/etc/nginx/nginx.conf:ro
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - dhis2
+      - default
+
+  ehr:
+    image: "hapiproject/hapi:v8.2.0-2-tomcat"
+    restart: always
+    volumes:
+      - ./config/ehr/hapi.application.yaml:/data/hapi/application.yaml:ro
+      - ./config/ehr/nehr-ips-package.tgz:/package.tgz:ro
+    environment:
+      SPRING_CONFIG_LOCATION: file:///data/hapi/application.yaml
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "echo -n '' > /dev/tcp/127.0.0.1/8080" ]
+      start_period: 120s
+      interval: 5s
+      timeout: 1s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - ehr
+
+  authorisation-server:
+    image: "quay.io/keycloak/keycloak:25.0.6"
+    restart: always
+    environment:
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+      KC_HEALTH_ENABLED: "true"
+
+      # comment KC_HOSTNAME and KC_HOSTNAME_BACKCHANNEL_DYNAMIC to test Keycloak from Docker host
+      KC_HOSTNAME: "http://authorisation-server:8080"
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"
+        ]
+      start_period: 120s
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ./config/authorisation-server/ehr-realm.json:/opt/keycloak/data/import/ehr-realm.json:ro
+    command: [ "start-dev", "--import-realm" ]
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - auth
+
+  ehr-gateway:
+    image: "quay.io/oauth2-proxy/oauth2-proxy:v7.6.0"
+    restart: always
+    command: --config /oauth2-proxy.cfg
+    volumes:
+      - "./config/ehr-gateway/oauth2-proxy-keycloak.cfg:/oauth2-proxy.cfg"
+    depends_on:
+      authorisation-server:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - auth
+      - ehr
+
+  fhir-sync-agent:
+    build: ./fhir-sync-agent
+    restart: always
+    environment:
+      EHR_URL: http://ehr-gateway:4180/fhir
+      OAUTH2_TOKENENDPOINT: http://authorisation-server:8080/realms/ehr/protocol/openid-connect/token
+      OAUTH2_CLIENTID: ehr-client
+      OAUTH2_CLIENTSECRET: ibz2lEXdGe02CJS2N7tY13r6664eJpoX
+      DHIS2DATABASEHOSTNAME: dhis2-db
+      DHIS2DATABASEPORT: 5432
+      DHIS2DATABASEUSER: dhis
+      DHIS2DATABASEPASSWORD: dhis
+      DHIS2DATABASEDBNAME: dhis
+      DHIS2APIURL: http://reverse-proxy/api
+      DHIS2APIUSERNAME: admin
+      DHIS2APIPASSWORD: district
+    depends_on:
+      authorisation-server:
+        condition: service_healthy
+      reverse-proxy:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - auth
+      - dhis2
+      - dhis2-db
+
+  seed:
+    image: curlimages/curl
+    command:
+      - "/bin/sh"
+      - "-c"
+      - |  
+        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d '["http://localhost:*"]' http://dhis2:8080/api/configuration/corsWhitelist
+    depends_on:
+      dhis2:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - dhis2
+
+networks:
+  dhis2:
+  ehr:
+  auth:
+    internal: true
+  dhis2-db:
+    internal: true

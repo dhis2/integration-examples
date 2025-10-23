@@ -1,0 +1,73 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:KGY0UKmRqqh",
+      "resource": {
+        "resourceType": "Patient",
+        "meta": [
+          {
+            "profile": "http://fhir.health.gov.lk/ips/StructureDefinition/ips-patient"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://fhir.health.gov.lk/ips/StructureDefinition/patient-registration-system",
+            "valueReference": {
+              "reference": "Device?identifier=http://fhir.health.gov.lk/ips/identifier/system-id|5b21b377-f424-48c1-8c24-1980b4d00059"
+            }
+          }
+        ],
+        "identifier": [
+          {
+            "use": "official",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.health.gov.lk/ips/CodeSystem/cs-identifier-types",
+                  "code": "PHN",
+                  "display": "Personal Health Number"
+                }
+              ],
+              "text": "Personal Health Number"
+            },
+            "system": "http://fhir.health.gov.lk/ips/identifier/phn",
+            "value": "12345678"
+          },
+          {
+            "use": "secondary",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.health.gov.lk/ips/CodeSystem/cs-identifier-types",
+                  "code": "NIC",
+                  "display": "National Identity Card"
+                }
+              ],
+              "text": "National identity number"
+            },
+            "system": "http://fhir.health.gov.lk/ips/identifier/nic",
+            "value": "200012345678"
+          },
+          {
+            "use": "secondary",
+            "system": "urn:dhis2:anc:regno",
+            "value": "ANC00000001"
+          }
+        ],
+        "name": [
+          {
+            "text": "Jane Doe",
+            "given": ["Jane"],
+            "family": "Doe"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Patient?identifier=http://fhir.health.gov.lk/ips/identifier/phn|12345678"
+      }
+    }
+  ]
+}
