@@ -1,6 +1,6 @@
 {
   "id": "5b7241af-b43c-4af1-a0b5-4957e338204b",
-  "realm": "ehr",
+  "realm": "fhir",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
@@ -57,7 +57,7 @@
       },
       {
         "id": "c981b14b-d83b-4202-96d1-5e85d94148ba",
-        "name": "default-roles-ehr",
+        "name": "default-roles-fhir",
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
@@ -299,7 +299,7 @@
           "attributes": {}
         }
       ],
-      "ehr-client": [],
+      "fhir-client": [],
       "security-admin-console": [],
       "admin-cli": [],
       "account-console": [],
@@ -407,7 +407,7 @@
   "groups": [],
   "defaultRole": {
     "id": "c981b14b-d83b-4202-96d1-5e85d94148ba",
-    "name": "default-roles-ehr",
+    "name": "default-roles-fhir",
     "description": "${role_default-roles}",
     "composite": true,
     "clientRole": false,
@@ -458,16 +458,16 @@
   "users": [
     {
       "id": "cf86adcd-3226-41ff-8cca-1bb3ac7528c9",
-      "username": "service-account-ehr-client",
+      "username": "service-account-fhir-client",
       "emailVerified": false,
       "createdTimestamp": 1727293066268,
       "enabled": true,
       "totp": false,
-      "serviceAccountClientId": "ehr-client",
+      "serviceAccountClientId": "fhir-client",
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
-        "default-roles-ehr"
+        "default-roles-fhir"
       ],
       "notBefore": 0,
       "groups": []
@@ -498,13 +498,13 @@
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/ehr/account/",
+      "baseUrl": "/realms/fhir/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/ehr/account/*"
+        "/realms/fhir/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -543,13 +543,13 @@
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/ehr/account/",
+      "baseUrl": "/realms/fhir/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/ehr/account/*"
+        "/realms/fhir/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -678,7 +678,7 @@
     },
     {
       "id": "5dd8af46-357c-4465-bac2-61a1f8b58e85",
-      "clientId": "ehr-client",
+      "clientId": "fhir-client",
       "name": "",
       "description": "",
       "rootUrl": "",
@@ -784,7 +784,7 @@
       "defaultClientScopes": [
         "web-origins",
         "acr",
-        "ehr-audience",
+        "fhir-audience",
         "profile",
         "roles",
         "basic",
@@ -843,13 +843,13 @@
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
-      "baseUrl": "/admin/ehr/console/",
+      "baseUrl": "/admin/fhir/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/admin/ehr/console/*"
+        "/admin/fhir/console/*"
       ],
       "webOrigins": [
         "+"
@@ -1485,7 +1485,7 @@
     },
     {
       "id": "ddf2f0d5-38d8-42d4-be2f-73ca35b7075a",
-      "name": "ehr-audience",
+      "name": "fhir-audience",
       "description": "",
       "protocol": "openid-connect",
       "attributes": {
@@ -1497,12 +1497,12 @@
       "protocolMappers": [
         {
           "id": "7ee31ab6-b0b4-408c-86ae-83f254fde9c5",
-          "name": "ehr",
+          "name": "fhir",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
           "consentRequired": false,
           "config": {
-            "included.client.audience": "ehr-client",
+            "included.client.audience": "fhir-client",
             "id.token.claim": "false",
             "lightweight.claim": "false",
             "access.token.claim": "true",

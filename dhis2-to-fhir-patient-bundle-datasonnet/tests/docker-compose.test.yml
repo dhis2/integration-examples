@@ -1,5 +1,5 @@
 services:
-  ehr:
+  hapi-fhir-ips:
     ports:
       - "8081:8080"
     networks:

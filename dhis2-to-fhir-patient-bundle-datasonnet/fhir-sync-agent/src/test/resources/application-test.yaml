@@ -28,12 +28,12 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-ehr-url: http://ehr
+fhir-url: http://hapi-fhir-ips
 
 oauth2:
-  clientId: ehr-client
+  clientId: fhir-client
   clientSecret: passw0rd
-  tokenEndpoint: http://authorisation-server/realms/ehr/protocol/openid-connect/token
+  tokenEndpoint: http://authorisation-server/realms/fhir/protocol/openid-connect/token
 
 spring:
   security:

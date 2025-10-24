@@ -65,7 +65,7 @@
             name: Content-Type
             constant: application/json
         - toD:
-            uri: "{{ehr-url}}"
+            uri: "{{fhir-url}}"
             parameters:
               httpMethod: POST
               oauth2ClientId: "{{oauth2.clientId}}"

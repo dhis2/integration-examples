@@ -66,12 +66,12 @@ services:
       - dhis2
       - default
 
-  ehr:
+  hapi-fhir-ips:
     image: "hapiproject/hapi:v8.2.0-2-tomcat"
     restart: always
     volumes:
-      - ./config/ehr/hapi.application.yaml:/data/hapi/application.yaml:ro
-      - ./config/ehr/nehr-ips-package.tgz:/package.tgz:ro
+      - ./config/hapi-fhir-ips/hapi.application.yaml:/data/hapi/application.yaml:ro
+      - ./config/hapi-fhir-ips/nehr-ips-package.tgz:/package.tgz:ro
     environment:
       SPRING_CONFIG_LOCATION: file:///data/hapi/application.yaml
     healthcheck:
@@ -83,7 +83,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - ehr
+      - hapi-fhir-ips
 
   authorisation-server:
     image: "quay.io/keycloak/keycloak:25.0.6"
@@ -107,19 +107,19 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - ./config/authorisation-server/ehr-realm.json:/opt/keycloak/data/import/ehr-realm.json:ro
+      - ./config/authorisation-server/fhir-realm.json:/opt/keycloak/data/import/fhir-realm.json:ro
     command: [ "start-dev", "--import-realm" ]
     security_opt:
       - no-new-privileges:true
     networks:
       - auth
 
-  ehr-gateway:
+  fhir-gateway:
     image: "quay.io/oauth2-proxy/oauth2-proxy:v7.6.0"
     restart: always
     command: --config /oauth2-proxy.cfg
     volumes:
-      - "./config/ehr-gateway/oauth2-proxy-keycloak.cfg:/oauth2-proxy.cfg"
+      - "./config/fhir-gateway/oauth2-proxy-keycloak.cfg:/oauth2-proxy.cfg"
     depends_on:
       authorisation-server:
         condition: service_healthy
@@ -127,15 +127,15 @@ services:
       - no-new-privileges:true
     networks:
       - auth
-      - ehr
+      - hapi-fhir-ips
 
   fhir-sync-agent:
     build: ./fhir-sync-agent
     restart: always
     environment:
-      EHR_URL: http://ehr-gateway:4180/fhir
-      OAUTH2_TOKENENDPOINT: http://authorisation-server:8080/realms/ehr/protocol/openid-connect/token
-      OAUTH2_CLIENTID: ehr-client
+      FHIR_URL: http://fhir-gateway:4180/fhir
+      OAUTH2_TOKENENDPOINT: http://authorisation-server:8080/realms/fhir/protocol/openid-connect/token
+      OAUTH2_CLIENTID: fhir-client
       OAUTH2_CLIENTSECRET: ibz2lEXdGe02CJS2N7tY13r6664eJpoX
       DHIS2DATABASEHOSTNAME: dhis2-db
       DHIS2DATABASEPORT: 5432
@@ -174,7 +174,7 @@ services:
 
 networks:
   dhis2:
-  ehr:
+  hapi-fhir-ips:
   auth:
     internal: true
   dhis2-db:

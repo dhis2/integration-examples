@@ -86,11 +86,11 @@ public class AbstractFunctionalTestCase {
     return new GenericContainer<>(DockerImageName.parse("hapiproject/hapi:v8.2.0-2-tomcat"))
         .withEnv("SPRING_CONFIG_LOCATION", "file:///data/hapi/application.yaml")
         .withFileSystemBind(
-            "../config/ehr/nehr-ips-package.tgz",
+            "../config/hapi-fhir-ips/nehr-ips-package.tgz",
             "/package.tgz",
             BindMode.READ_ONLY)
         .withFileSystemBind(
-            "../config/ehr/hapi.application.yaml",
+            "../config/hapi-fhir-ips/hapi.application.yaml",
             "/data/hapi/application.yaml",
             BindMode.READ_ONLY)
         .withExposedPorts(8080)
@@ -149,10 +149,10 @@ public class AbstractFunctionalTestCase {
       HAPI_FHIR_CONTAINER.start();
       String fhirServerUrl =
           String.format("http://localhost:%s/fhir", HAPI_FHIR_CONTAINER.getFirstMappedPort());
-      System.setProperty("ehr-url", fhirServerUrl);
+      System.setProperty("fhir-url", fhirServerUrl);
       authorisationServerUrl =
           String.format(
-              "http://localhost:%s/realms/ehr/protocol/openid-connect/token",
+              "http://localhost:%s/realms/fhir/protocol/openid-connect/token",
               TestSocketUtils.findAvailableTcpPort());
       fhirClient = FhirVersionEnum.R4.newContext().newRestfulGenericClient(fhirServerUrl);
 
