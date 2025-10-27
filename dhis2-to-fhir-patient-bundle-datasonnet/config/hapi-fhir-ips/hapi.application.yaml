@@ -161,8 +161,8 @@ hapi:
     implementationguides:
       ips:
         packageUrl: file:///package.tgz
-        name: lk-nehr-fhir-ips.r4
-        version: 0.1.0
+        name: hl7.fhir.uv.ips.r4
+        version: 2.0.0
         installMode: STORE_AND_INSTALL
         validate_resource_status_for_package_upload: false
     ###    example from registry (packages.fhir.org)

@@ -86,7 +86,7 @@ public class AbstractFunctionalTestCase {
     return new GenericContainer<>(DockerImageName.parse("hapiproject/hapi:v8.2.0-2-tomcat"))
         .withEnv("SPRING_CONFIG_LOCATION", "file:///data/hapi/application.yaml")
         .withFileSystemBind(
-            "../config/hapi-fhir-ips/nehr-ips-package.tgz",
+            "../config/hapi-fhir-ips/fhir-ips-ig.tgz",
             "/package.tgz",
             BindMode.READ_ONLY)
         .withFileSystemBind(

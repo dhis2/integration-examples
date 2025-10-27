@@ -71,7 +71,7 @@ services:
     restart: always
     volumes:
       - ./config/hapi-fhir-ips/hapi.application.yaml:/data/hapi/application.yaml:ro
-      - ./config/hapi-fhir-ips/nehr-ips-package.tgz:/package.tgz:ro
+      - ./config/hapi-fhir-ips/fhir-ips-ig.tgz:/package.tgz:ro
     environment:
       SPRING_CONFIG_LOCATION: file:///data/hapi/application.yaml
     healthcheck:
