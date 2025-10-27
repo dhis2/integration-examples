@@ -64,13 +64,13 @@ import org.testcontainers.utility.DockerImageName;
 @CamelSpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class AbstractFunctionalTestCase {
+public abstract class AbstractFunctionalTestBase {
 
-  @Container public static GenericContainer<?> HAPI_FHIR_CONTAINER;
+  @Container public static final GenericContainer<?> hapiFhirContainer = newHapiFhirContainer();
 
-  @Container public static GenericContainer<?> DHIS2_CONTAINER;
+  @Container public static final GenericContainer<?> dhis2Container = newDhis2Container();
 
-  @Container public static GenericContainer<?> DHIS2_DB_CONTAINER;
+  @Container public static final GenericContainer<?> dhis2DbContainer = newPostgreSQLContainer("dhis2", "dhis", "dhis", Network.builder().build());
 
   @Autowired protected CamelContext camelContext;
 
@@ -101,15 +101,11 @@ public class AbstractFunctionalTestCase {
   private static GenericContainer<?> newDhis2Container() {
     Network.NetworkImpl dhis2Network = Network.builder().build();
 
-    DHIS2_DB_CONTAINER = newPostgreSQLContainer("dhis2", "dhis", "dhis", dhis2Network);
-    DHIS2_DB_CONTAINER.start();
-    System.setProperty("dhis2DatabasePort", DHIS2_DB_CONTAINER.getFirstMappedPort().toString());
-
     return new GenericContainer<>("dhis2/core:42.1.0")
         .withClasspathResourceMapping("dhis.conf", "/opt/dhis2/dhis.conf", BindMode.READ_WRITE)
         .withNetwork(dhis2Network)
         .withExposedPorts(8080)
-        .dependsOn(DHIS2_DB_CONTAINER)
+        .dependsOn(dhis2DbContainer)
         .waitingFor(
             new HttpWaitStrategy().forStatusCode(200).withStartupTimeout(Duration.ofSeconds(120)))
         .withEnv("WAIT_FOR_DB_CONTAINER", "db" + ":" + 5432 + " -t 0");
@@ -136,19 +132,24 @@ public class AbstractFunctionalTestCase {
   public static void beforeAll() throws IOException {
     if (HAPI_FHIR_CONTAINER == null) {
       Files.deleteIfExists(Path.of("target/offset.dat"));
+  @BeforeAll
+  public static void beforeAll() throws IOException {
+    if (hapiFhirContainer == null) {
+      Files.deleteIfExists(Path.of("target/offset.dat"));
 
-      DHIS2_CONTAINER = newDhis2Container();
-      DHIS2_CONTAINER.start();
+      dhis2DbContainer.start();
+      System.setProperty("dhis2DatabasePort", dhis2DbContainer.getFirstMappedPort().toString());
+
+      dhis2Container.start();
       String dhis2ApiUrl =
           String.format(
-              "http://%s:%s/api", DHIS2_CONTAINER.getHost(), DHIS2_CONTAINER.getFirstMappedPort());
+              "http://%s:%s/api", dhis2Container.getHost(), dhis2Container.getFirstMappedPort());
       System.setProperty("dhis2ApiUrl", dhis2ApiUrl);
       dhis2Client = Dhis2ClientBuilder.newClient(dhis2ApiUrl, "admin", "district").build();
 
-      HAPI_FHIR_CONTAINER = newHapiFhirContainer();
-      HAPI_FHIR_CONTAINER.start();
+      hapiFhirContainer.start();
       String fhirServerUrl =
-          String.format("http://localhost:%s/fhir", HAPI_FHIR_CONTAINER.getFirstMappedPort());
+          String.format("http://localhost:%s/fhir", hapiFhirContainer.getFirstMappedPort());
       System.setProperty("fhir-url", fhirServerUrl);
       authorisationServerUrl =
           String.format(
@@ -159,10 +160,6 @@ public class AbstractFunctionalTestCase {
       System.setProperty("oauth2.tokenEndpoint", authorisationServerUrl);
     }
   }
-
-  protected void startMockAuthorisationServer() throws Exception {
-    if (authorisationServerCamelContext == null) {
-        authorisationServerCamelContext = new org.apache.camel.impl.DefaultCamelContext();
         authorisationServerCamelContext.addRoutes(new org.apache.camel.builder.RouteBuilder() {
             @Override
           public void configure() {
@@ -201,7 +198,7 @@ public class AbstractFunctionalTestCase {
         authorisationServerCamelContext.start();
         }
     }
-    protected void stopMockAuthorisationServer() throws Exception {
+    protected void stopMockAuthorisationServer() {
         if (authorisationServerCamelContext != null && authorisationServerCamelContext.isStarted()) {
             authorisationServerCamelContext.stop();
         }

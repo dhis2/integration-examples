@@ -45,7 +45,7 @@ import org.hisp.dhis.api.model.v40_2_2.EnrollmentInfo;
 import org.hisp.dhis.api.model.v40_2_2.EventInfo;
 import org.hisp.dhis.api.model.v40_2_2.TrackedEntityInfo;
 import org.hisp.dhis.api.model.v40_2_2.TrackerImportReport;
-import org.hisp.dhis.integration.camel.AbstractFunctionalTestCase;
+import org.hisp.dhis.integration.camel.AbstractFunctionalTestBase;
 import org.hisp.dhis.integration.camel.util.FhirValidatorUtil;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Patient;
@@ -55,7 +55,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @UseAdviceWith
-public class UpsertPatientRouteFunctionalTestCase extends AbstractFunctionalTestCase {
+public class UpsertPatientRouteFunctionalTestCase extends AbstractFunctionalTestBase {
   @Autowired private CamelContext camelContext;
 
   @BeforeEach

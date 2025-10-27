@@ -32,6 +32,11 @@ package org.hisp.dhis.integration.camel.util;
 import org.hl7.fhir.r4.model.OperationOutcome;
 
 public class FhirValidatorUtil {
+    
+    private FhirValidatorUtil() {
+        // Utility class
+    }
+    
     public static String extractValidationErrors(OperationOutcome outcome) {
         StringBuilder errorDetails = new StringBuilder();
         for (OperationOutcome.OperationOutcomeIssueComponent issue : outcome.getIssue()) {

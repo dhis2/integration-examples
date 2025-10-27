@@ -35,12 +35,9 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalManagementPort;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 
-public class HawtioWebConsoleFunctionalTestCase extends AbstractFunctionalTestCase {
+public class HawtioWebConsoleFunctionalTestCase extends AbstractFunctionalTestBase {
   @LocalManagementPort private int managementPort;
 
   private RequestSpecification hawtioRequestSpec;
@@ -57,6 +54,8 @@ public class HawtioWebConsoleFunctionalTestCase extends AbstractFunctionalTestCa
   @Test
   public void testAnonymousHttpGet() {
     given(hawtioRequestSpec)
+        .when()
+        .get()
         .then()
         .statusCode(401);
   }
@@ -66,6 +65,8 @@ public class HawtioWebConsoleFunctionalTestCase extends AbstractFunctionalTestCa
     given(hawtioRequestSpec)
         .auth()
         .basic("test", "test")
+        .when()
+        .get()
         .then()
         .statusCode(200);
   }

@@ -80,7 +80,11 @@ public class DefaultSecurityConfig implements ApplicationListener<WebServerIniti
   }
 
   @Override
-  public void onApplicationEvent(WebServerInitializedEvent event) {}
+  public void onApplicationEvent(WebServerInitializedEvent event) {
+    /*
+     * Logic to execute when the web server is initialized
+     */
+  }
 
   static class SpaCsrfTokenRequestHandler extends CsrfTokenRequestAttributeHandler {
     private final CsrfTokenRequestHandler delegate = new XorCsrfTokenRequestAttributeHandler();

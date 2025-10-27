@@ -45,7 +45,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.hisp.dhis.integration.camel.util.FhirValidatorUtil;
 
-public class UpsertDeviceInformationRouteFunctionalTestCase extends AbstractFunctionalTestCase {
+public class UpsertDeviceInformationRouteFunctionalTestCase extends AbstractFunctionalTestBase {
   @Autowired private CamelContext camelContext;
 
   @BeforeEach
