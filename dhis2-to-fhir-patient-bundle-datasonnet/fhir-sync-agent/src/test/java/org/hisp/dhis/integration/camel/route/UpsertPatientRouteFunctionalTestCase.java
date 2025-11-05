@@ -72,31 +72,24 @@ public class UpsertPatientRouteFunctionalTestCase extends AbstractFunctionalTest
   public void testUpsertPatient() throws Exception {
     AdviceWith.adviceWith(camelContext, "upsertPatient", r -> r.weaveAddLast().to("mock:spy"));
     MockEndpoint spyEndpoint = camelContext.getEndpoint("mock:spy", MockEndpoint.class);
-    AdviceWith.adviceWith(camelContext, "upsertDeviceInformation", r -> r.weaveAddLast().to("mock:deviceSpy"));
-    MockEndpoint deviceSpyEndpoint = camelContext.getEndpoint("mock:deviceSpy", MockEndpoint.class);
-    deviceSpyEndpoint.setExpectedCount(1);
     spyEndpoint.setExpectedCount(1);
 
     camelContext.start();
-    deviceSpyEndpoint.assertIsSatisfied(30000);
-    String orgUnit = "Tnl7qgZh7zL";
+    String orgUnit = "DiszpKrYNg8";
     TrackedEntityInfo trackedEntity = new TrackedEntityInfo()
         .withOrgUnit(orgUnit)
-        .withTrackedEntityType("MxdEsVAegt5")
+        .withTrackedEntityType("nEenWmSyUEp")
         .withAttributes(List.of(
-            new AttributeInfo().withAttribute("VQl0wK3eqiw").withValue("Jane Doe"),
-            new AttributeInfo().withAttribute("CSZevH4P5yV").withValue("ANC00000002"),
-            new AttributeInfo().withAttribute("M6NNPC3hNrb").withValue("200012345679"),
-            new AttributeInfo().withAttribute("p7zizFkC6Lv").withValue("Female"),
-            new AttributeInfo().withAttribute("IrUmPkFMDU5").withValue("12345678"),
-            new AttributeInfo().withAttribute("u5AESfSOhIG").withValue("28"),
-            new AttributeInfo().withAttribute("Yie7mOY913J").withValue("1997-08-01"),
-            new AttributeInfo().withAttribute("gGAQeOr1Pgu").withValue("+94712345678"),
-            new AttributeInfo().withAttribute("EOMGwaUTMrU").withValue("123 Main Street, 1234 Akurana, Kandy, Central Province, LK")))
+            new AttributeInfo().withAttribute("lZGmxYbs97q").withValue("8437107"),  // Unique ID
+            new AttributeInfo().withAttribute("VqEFza8wbwA").withValue("Madison Avenue 12"),  // Address
+            new AttributeInfo().withAttribute("w75KJ2mc4zz").withValue("Jane"),  // First name
+            new AttributeInfo().withAttribute("zDhUuAYrxNC").withValue("Doe"),  // Last name
+            new AttributeInfo().withAttribute("FO4sWYJ64LQ").withValue("New York")  // City
+        ))
         .withEnrollments(
             addEnrollment(
                 orgUnit,
-                List.of("LWJcStrI6kM", "GX0z9IXFaso")));
+                List.of("WZbXY0S00lP")));
 
     dhis2Client
         .post("tracker")
@@ -122,7 +115,7 @@ public class UpsertPatientRouteFunctionalTestCase extends AbstractFunctionalTest
     List<Bundle.BundleEntryComponent> entries = patientBundle.getEntry();
     assertEquals(1, entries.size());
     Patient patient = (Patient) entries.get(0).getResource();
-    assertEquals("12345678", patient.getIdentifier().get(0).getValue());
+    assertEquals("8437107", patient.getIdentifier().get(0).getValue());
     
     org.hl7.fhir.r4.model.Parameters params = new org.hl7.fhir.r4.model.Parameters();
     params.addParameter().setName("resource").setResource(patient);
@@ -150,26 +143,29 @@ public class UpsertPatientRouteFunctionalTestCase extends AbstractFunctionalTest
               .withProgramStage(programStage)
               .withOrgUnit(orgUnitId)
               .withScheduledAt(today)
-              .withProgram("eozjj9UivfS")
+              .withProgram("WSGAb5XwJ3Y") 
               .withStatus(EventInfo.StatusRef.SCHEDULE));
     }
 
     return List.of(
         new EnrollmentInfo()
             .withOrgUnit(orgUnitId)
-            .withProgram("eozjj9UivfS")
+            .withProgram("WSGAb5XwJ3Y")
             .withEnrolledAt(today)
             .withAttributes(
                 List.of(
-                    new AttributeInfo().withAttribute("p7zizFkC6Lv").withValue("Female"),
-                    new AttributeInfo().withAttribute("CSZevH4P5yV").withValue("ANC00000002"),
-                    new AttributeInfo().withAttribute("M6NNPC3hNrb").withValue("200012345679"),
-                    new AttributeInfo().withAttribute("IrUmPkFMDU5").withValue("12345678"),
-                    new AttributeInfo().withAttribute("u5AESfSOhIG").withValue("28"),
-                    new AttributeInfo().withAttribute("Yie7mOY913J").withValue("1997-08-01"),
-                    new AttributeInfo().withAttribute("gGAQeOr1Pgu").withValue("+94712345678"),
-                    new AttributeInfo().withAttribute("VQl0wK3eqiw").withValue("Joe Doe"),
-                    new AttributeInfo().withAttribute("EOMGwaUTMrU").withValue("123 Main Street, 1234 Akurana, Kandy, Central Province, LK")))
+                    new AttributeInfo().withAttribute("Agywv2JGwuq").withValue("+13052065294"),
+                    new AttributeInfo().withAttribute("ZcBPrXKahq2").withValue("10022"),
+                    new AttributeInfo().withAttribute("KmEUg2hHEtx").withValue("jane@doe.com"),
+                    new AttributeInfo().withAttribute("ciq2USN94oJ").withValue("Single or widow"),
+                    new AttributeInfo().withAttribute("w75KJ2mc4zz").withValue("Jane"),
+                    new AttributeInfo().withAttribute("zDhUuAYrxNC").withValue("Doe"),
+                    new AttributeInfo().withAttribute("FO4sWYJ64LQ").withValue("New York"),
+                    new AttributeInfo().withAttribute("gHGyrwKPzej").withValue("1997-04-18"),
+                    new AttributeInfo().withAttribute("VqEFza8wbwA").withValue("Madison Avenue 12"),
+                    new AttributeInfo().withAttribute("lZGmxYbs97q").withValue("8437107"),
+                    new AttributeInfo().withAttribute("gu1fqsmoU8r").withValue("NSAIDS")
+                ))
             .withOccurredAt(today)
             .withStatus(EnrollmentInfo.StatusRef.ACTIVE)
             .withEvents(events));

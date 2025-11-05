@@ -1,38 +1,19 @@
+// This DataSonnet script transforms DHIS2 WHO RMNCAH Tracked Entities
+// into FHIR IPS-compliant transaction bundles.
+//
+// Input: DHIS2 Tracked Entity JSON (body)
+// Output: FHIR Bundle (transaction type) with IPS-conformant resources
+
 local patient = import 'patientResource.libsonnet';
-local practitioner = import 'practitionerResource.libsonnet';
-local encounter = import 'encounterResource.libsonnet';
-local registration = import 'registrationResources.libsonnet';
-local visit = import 'ancVisitResources.libsonnet';
-local referral = import 'referralResources.libsonnet';
-
-local teiUpdatedBy = (body.updatedBy) default null;
-
-local getAttrById(attr) = ds.filter(body.enrollments[0].attributes, function(v, i) v.attribute == attr)[0].value default null;
-local phnValue = getAttrById("IrUmPkFMDU5");
-
-local enrollments(tei) = (tei.enrollments) default [];
-local enrollmentEvents(tei) = std.flattenArrays([ (en.events default []) for en in (tei.enrollments default []) ]);
-local completedEvents(tei) = [
-  ev
-  for ev in enrollmentEvents(tei)
-  if (ev.status default "") == "COMPLETED"
-];
-
-local entries(tei) = std.prune([
-  patient.patient_entry(ds, tei),
-  practitioner.practitioner_entry_from_user(ds, teiUpdatedBy)
-])
-+
-[ encounter.encounter_entry(ds, phnValue, event) for event in completedEvents(tei) ]
-+
-std.flattenArrays([registration.resources_for_registration_event(ds, phnValue, ev) for ev in completedEvents(tei)])
-+
-std.flattenArrays([visit.resources_for_anc_visit_event(ds, phnValue, ev) for ev in completedEvents(tei)])
-+
-std.flattenArrays([referral.resources_for_referral_event(ds, phnValue, ev) for ev in completedEvents(tei)]);
 
 {
   resourceType: "Bundle",
   type: "transaction",
-  entry: entries(body)
+  
+  // Build bundle entries
+  // Currently includes: Patient resource
+  // Can be extended with: Practitioner, Encounter, Observation, AllergyIntolerance, etc.
+  entry: std.prune([
+    patient.patient_entry(body)
+  ])
 }

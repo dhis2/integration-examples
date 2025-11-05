@@ -28,7 +28,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-FROM openjdk:21-slim
+FROM eclipse-temurin:21-jre
 COPY target/fhir-sync-agent-1.0.0-SNAPSHOT.jar fhir-sync-agent-1.0.0-SNAPSHOT.jar
 EXPOSE 9070
 ENTRYPOINT ["java","-jar","/fhir-sync-agent-1.0.0-SNAPSHOT.jar"]
