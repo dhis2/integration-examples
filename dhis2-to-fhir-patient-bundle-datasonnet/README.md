@@ -27,7 +27,7 @@ yarn install --frozen-lockfile
 yarn build
 yarn start
 ```
-This will spin up a DHIS2 instance with the Sierra Leone demo DB, a HAPI FHIR server with the IPS Profiles loaded, and a middleware solution that listens to Tracked Entity changes in the DHIS2 instance. 
+This will spin up a DHIS2 instance with the Sierra Leone demo DB on `localhost:8080`, a HAPI FHIR server with the IPS Profiles loaded on `localhost:8081/fhir`, and a middleware solution that listens to Tracked Entity changes in the DHIS2 instance. 
 
 To run the transformation tests, run the following command:
 
