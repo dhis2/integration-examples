@@ -2,7 +2,7 @@
 
 This example shows how to transform DHIS2 tracked entities into FHIR IPS (International Patient Summary) Patient profiles. It's a practical reference for integrating DHIS2 maternal health data with FHIR-based health information exchanges.
 
-## What is this?
+## What is included in this example?
 
 When DHIS2 tracks patients in programs like WHO RMNCAH (maternal health), you often need to share that data with other systems using FHIR. This example demonstrates a lossless mapping approach where:
 
