@@ -18,6 +18,8 @@ The mapping uses DataSonnet with Jsonnet libraries, using helper functions when 
 **Prerequisites:**
 - Java 11+
 - Maven 3.6+
+- Node.js 18+
+- Yarn
 - Docker
 
 After installing the prerequisites, you can run the entire stack by simply running the following commands:
@@ -39,6 +41,18 @@ mvn clean test -Dtest=IpsPatientMappingTestCase
 ## Architecture
 
 When someone enrolls in the WHO RMNCAH program in DHIS2, the sync agent picks up that event, transforms the tracked entity data into FHIR resources that are conformant to the IPS Patient Profile, and pushes them to the HAPI FHIR server.
+
+### Technology Stack
+
+This example uses **Apache Camel** as middleware to connect DHIS2 with the FHIR server. Camel is a mature open-source integration framework with extensive connectors for health systems, making it a popular choice for DHIS2 integrations (also used by OpenMRS ETL, OpenEHR FHIR bridge, and others).
+
+**Why Apache Camel?** It's flexible, used across multiple industries, and comes with built-in components for DHIS2, FHIR, HL7v2, and hundreds of other systems. This means you can adapt this example to connect DHIS2 with whatever systems your country needs.
+
+**Transformation approach:** This example uses **DataSonnet**, a declarative mapping language for transforming JSON structures. You write the mapping once, and users can update it without touching code. The alternative is procedural Java with the HAPI FHIR library, but DataSonnet keeps things simpler and more maintainable.
+
+![Middleware Diagram](docs/image.png)
+
+Want to learn more? See the [FHIR Page](https://dhis2.org/integration/fhir/) on the DHIS2 website.
 
 **Key files:**
 
