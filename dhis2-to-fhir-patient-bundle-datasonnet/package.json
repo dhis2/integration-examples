@@ -1,0 +1,22 @@
+{
+  "name": "reference-dhis2-mosip-integration",
+  "version": "1.0.0",
+  "description": "This is a reference implementation of a **DHIS2 MOSIP Integration** from within the DHIS2 Capture App, with a FHIR-compliant electronic health record backend protected by OAuth2 authorization.  This is an example which should be used for reference, it **SHOULD NOT** be used directly in production.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.47.2",
+    "@types/node": "^22.7.3",
+    "concurrently": "^9.0.1",
+    "wait-on": "^8.0.1"
+  },
+  "scripts": {
+    "build-fhir-sync-agent": "mvn -B clean package -Dmaven.test.skip=true -f fhir-sync-agent/pom.xml",
+    "build": "concurrently --kill-others-on-fail \"yarn:build-fhir-sync-agent\"",
+    "start-services": "docker compose -f docker-compose.yml -f tests/docker-compose.test.yml up --build --renew-anon-volumes --force-recreate --remove-orphans",
+    "start": "concurrently --kill-others-on-fail \"yarn:start-services\"",
+    "test": "playwright test"
+  }
+}

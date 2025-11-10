@@ -1,0 +1,21 @@
+{
+  "trackedEntity": "MinimalTEI001",
+  "trackedEntityType": "nEenWmSyUEp",
+  "orgUnit": "DiszpKrYNg8",
+  "attributes": [
+    { "attribute": "lZGmxYbs97q", "value": "MIN001" },
+    { "attribute": "w75KJ2mc4zz", "value": "Jane" },
+    { "attribute": "zDhUuAYrxNC", "value": "Smith" },
+    { "attribute": "gHGyrwKPzej", "value": "2000-01-01" }
+  ],
+  "enrollments": [
+    {
+      "attributes": [
+        { "attribute": "lZGmxYbs97q", "value": "MIN001" },
+        { "attribute": "w75KJ2mc4zz", "value": "Jane" },
+        { "attribute": "zDhUuAYrxNC", "value": "Smith" },
+        { "attribute": "gHGyrwKPzej", "value": "2000-01-01" }
+      ]
+    }
+  ]
+}

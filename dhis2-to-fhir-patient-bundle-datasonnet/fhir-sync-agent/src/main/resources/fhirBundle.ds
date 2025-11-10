@@ -1,0 +1,19 @@
+// This DataSonnet script transforms DHIS2 WHO RMNCAH Tracked Entities
+// into FHIR IPS-compliant transaction bundles.
+//
+// Input: DHIS2 Tracked Entity JSON (body)
+// Output: FHIR Bundle (transaction type) with IPS-conformant resources
+
+local patient = import 'patientResource.libsonnet';
+
+{
+  resourceType: "Bundle",
+  type: "transaction",
+  
+  // Build bundle entries
+  // Currently includes: Patient resource
+  // Can be extended with: Practitioner, Encounter, Observation, AllergyIntolerance, etc.
+  entry: std.prune([
+    patient.patient_entry(body)
+  ])
+}

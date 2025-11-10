@@ -1,0 +1,104 @@
+#
+# Copyright (c) 2004-2025, University of Oslo
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors
+# may be used to endorse or promote products derived from this software without
+# specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+- route:
+    id: captureChangeRoute
+    description: Listens for tracked entity changes in the source DHIS2 database.
+    from:
+      description: |
+        Captures all database row changes applied to the `trackedentity` table.
+      uri: debezium-postgres:dhis2
+      parameters:
+        databaseHostname: "{{dhis2DatabaseHostname}}"
+        databasePort: "{{dhis2DatabasePort}}"
+        databaseUser: "{{dhis2DatabaseUser}}"
+        databasePassword: "{{dhis2DatabasePassword}}"
+        databaseDbname: "{{dhis2DatabaseDbName}}"
+        offsetStorageFileName: "{{offsetStorageFileName:offset.dat}}"
+        topicPrefix: dhis2
+        pluginName: pgoutput
+        tableIncludeList: "{{tableIncludeList:public.trackedentity}}"
+        columnIncludeList: ".*"
+        schemaIncludeList: "{{schemaIncludeList:public}}"
+        slotName: "{{slotName:slot1}}"
+        snapshotMode: "{{snapshotMode:no_data}}"
+        publicationAutocreateMode: "{{publicationAutocreateMode:all_tables}}"
+        publicationName: "{{publicationName:dbz_publication}}"
+      steps:
+        - filter:
+            description: Filters out delete sync operations since a delete operation does not import data.
+            simple: ${headers.CamelDebeziumOperation} != 'd'
+        - log: "Capturing database change [${headers}]..."
+        - to: direct:fetchTrackedEntity
+        - transform:
+            datasonnet:
+              outputMediaType: application/json
+              resultType: String
+              bodyMediaType: application/json
+              expression: resource:classpath:fhirBundle.ds
+        - to: direct:upsertPatient
+
+- route:
+    id: fetchTrackedEntity
+    description: |
+      Fetches the changed tracked entity from the DHIS2 Web API.
+    from:
+      uri: direct:fetchTrackedEntity
+      steps:
+        - toD:
+            description: Fetches the tracked entity from the source DHIS2 server.
+            uri: dhis2:get/resource
+            parameters:
+              path: tracker/trackedEntities/${body.get('uid')}
+              fields: "*"
+              baseApiUrl: ${properties:dhis2ApiUrl}
+              username: ${properties:dhis2ApiUsername:}
+              password: ${properties:dhis2ApiPassword:}
+              personalAccessToken: ${properties:dhis2ApiPersonalAccessToken:}
+        - log: |
+            Fetched tracked entity =>
+            
+            ${body}
+
+- route:
+    id: upsertPatient
+    from:
+      uri: direct:upsertPatient
+      steps:
+        - setHeader:
+            name: Content-Type
+            constant: application/json
+        - toD:
+            uri: "{{fhir-url}}"
+            parameters:
+              httpMethod: POST
+              oauth2ClientId: "{{oauth2.clientId}}"
+              oauth2ClientSecret: "{{oauth2.clientSecret}}"
+              oauth2TokenEndpoint: "{{oauth2.tokenEndpoint}}"
